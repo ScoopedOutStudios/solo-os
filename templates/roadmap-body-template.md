@@ -1,6 +1,6 @@
 ## Summary
 
-One-sentence description of the committed strategic bet or outcome.
+Brief description of the committed strategic bet or outcome.
 
 ## Why This Matters
 
@@ -34,3 +34,4 @@ One-sentence description of the committed strategic bet or outcome.
 ## Context
 
 - 2-3 bullets of relevant background, discovery findings, or market context.
+

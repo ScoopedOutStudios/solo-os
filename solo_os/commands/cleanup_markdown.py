@@ -13,15 +13,21 @@ from typing import Any
 from solo_os import config
 
 VERSION_RE = re.compile(r"^(?P<base>.+)-v(?P<ver>\d+)\.md$")
-PATH_REF_RE = re.compile(r"agent_generated/[A-Za-z0-9_\-./]+\.md")
 BACKTICK_MD_RE = re.compile(r"`([^`]+\.md)`")
 STATUS_RE = re.compile(r"^status:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 
 
-def collect_keep_paths(agent_root: Path, keep_names: list[str]) -> set[Path]:
+def _build_path_ref_re(target_dir: str) -> re.Pattern[str]:
+    escaped = re.escape(target_dir)
+    return re.compile(rf"{escaped}/[A-Za-z0-9_\-./]+\.md")
+
+
+def collect_keep_paths(
+    scan_root: Path, keep_names: list[str], target_dir: str
+) -> set[Path]:
     keep: set[Path] = set()
-    all_md = list(agent_root.rglob("*.md"))
-    lookup = {p.as_posix(): p for p in all_md}
+    all_md = list(scan_root.rglob("*.md"))
+    path_ref_re = _build_path_ref_re(target_dir)
 
     for p in all_md:
         if p.name in keep_names:
@@ -30,15 +36,15 @@ def collect_keep_paths(agent_root: Path, keep_names: list[str]) -> set[Path]:
     pointer_files = [p for p in all_md if p.name == "LATEST.md" or p.name == "_index.md"]
     for pointer in pointer_files:
         text = pointer.read_text(encoding="utf-8")
-        for match in PATH_REF_RE.findall(text):
-            resolved = agent_root.parent / match
+        for match in path_ref_re.findall(text):
+            resolved = scan_root.parent / match
             if resolved.exists():
                 keep.add(resolved)
 
         for rel in BACKTICK_MD_RE.findall(text):
             rel_path = rel.strip()
-            if rel_path.startswith("agent_generated/"):
-                candidate = agent_root.parent / rel_path
+            if rel_path.startswith(f"{target_dir}/"):
+                candidate = scan_root.parent / rel_path
             else:
                 candidate = pointer.parent / rel_path
             if candidate.exists():
@@ -79,16 +85,22 @@ def candidate_reason(path: Path, keep: set[Path]) -> str | None:
     return None
 
 
-def archive_destination(agent_root: Path, archive_root_name: str, source: Path) -> Path:
-    rel = source.relative_to(agent_root)
+def archive_destination(scan_root: Path, archive_root_name: str, source: Path) -> Path:
+    rel = source.relative_to(scan_root)
     today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
-    return agent_root / archive_root_name / today / rel
+    return scan_root / archive_root_name / today / rel
 
 
 def handle_cleanup_markdown(args: argparse.Namespace) -> int:
     root = config.find_root()
     repos = config.repo_list(root)
     cleanup_cfg = config.settings("cleanup", root)
+
+    target_dir = str(cleanup_cfg.get("target_directory", "")).strip()
+    if not target_dir:
+        print("== Markdown Cleanup ==")
+        print("- SKIP: no cleanup.target_directory configured in solo-os.yml")
+        return 0
 
     keep_names = [str(x) for x in cleanup_cfg.get("keep_file_names", [])]
     archive_root_name = str(cleanup_cfg.get("archive_root_name", "archive"))
@@ -105,18 +117,19 @@ def handle_cleanup_markdown(args: argparse.Namespace) -> int:
 
     print("== Markdown Cleanup ==")
     print(f"- Mode: {'APPLY' if args.apply else 'DRY-RUN'}")
+    print(f"- Target directory: {target_dir}/")
 
     for repo in repos:
         repo_id = str(repo.get("id"))
         repo_path = Path(str(repo.get("path", "")))
-        agent_root = repo_path / "agent_generated"
-        if not agent_root.exists():
-            print(f"- SKIP [{repo_id}]: missing agent_generated/")
+        scan_root = repo_path / target_dir
+        if not scan_root.exists():
+            print(f"- SKIP [{repo_id}]: missing {target_dir}/")
             continue
 
-        keep = collect_keep_paths(agent_root, keep_names)
+        keep = collect_keep_paths(scan_root, keep_names, target_dir)
         md_files = [
-            p for p in agent_root.rglob("*.md") if f"/{archive_root_name}/" not in p.as_posix()
+            p for p in scan_root.rglob("*.md") if f"/{archive_root_name}/" not in p.as_posix()
         ]
 
         project_candidates: list[tuple[Path, str]] = []
@@ -136,7 +149,7 @@ def handle_cleanup_markdown(args: argparse.Namespace) -> int:
             all_candidates.append({"repoId": repo_id, "path": rel, "reason": reason})
 
             if args.apply:
-                dest = archive_destination(agent_root, archive_root_name, source)
+                dest = archive_destination(scan_root, archive_root_name, source)
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(source), str(dest))
                 moved.append(

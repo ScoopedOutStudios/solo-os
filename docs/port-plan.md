@@ -14,7 +14,7 @@
 - Idea lifecycle end-state: what "resolved" means for a Done Idea is unclear
 - "Ready To Merge" status exists in code but is not documented in workflow-system.md
 - Transition mechanics (Idea -> Roadmap, Roadmap -> BL) lack concrete steps
-- Simple mode vs isolated mode adds cognitive overhead for new users
+- sos-hq docs described "simple mode" vs "isolated mode" execution — unnecessary complexity removed from solo-os
 
 ### Missing
 - No templates for Ideas or Roadmap issue bodies (only Build Loop had one)
@@ -23,13 +23,13 @@
 - When to close vs leave open after spawning child work
 
 ### Simplified for v1
-- All isolated mode / worktree content removed from scope
+- All execution mode and worktree content removed entirely (not deferred)
 - References to hardcoded org/paths made generic
 - `agent_generated/` folder convention not assumed for external users
 
 ### Docs-vs-code drift
 - "Ready To Merge" status: used in build_loop_ops.py but absent from Status options
-- Branch naming convention only enforced in isolated mode (worktree_ops.py)
+- Branch naming convention was only enforced in worktree_ops.py (removed from solo-os scope)
 - Operating Rules reference `python3 solo-os/scripts/solo_os.py` (old path)
 
 ## Per-Module Decisions
@@ -43,8 +43,8 @@
 | scripts/daily_triage.py | Port (modified) | Uses config.settings("daily_triage"); ANSI helpers shared; snake_case config keys |
 | scripts/sync_audit.py | Port (modified) | Uses config.repo_list() and config.settings("validation"); report path relative to config root |
 | scripts/cleanup_markdown.py | Port (modified) | Uses config accessors; report path relative to config root |
-| scripts/build_loop_ops.py | **Deferred** | Depends on worktree_ops; deferred until worktrees decision is revisited |
-| scripts/worktree_ops.py | **Removed from v1** | Worktree management removed from solo-os scope |
+| scripts/build_loop_ops.py | **Removed** | Depended on worktree_ops; removed from solo-os scope |
+| scripts/worktree_ops.py | **Removed** | Worktree management removed entirely from solo-os scope |
 | scripts/init_repo.py | **Deferred** | BL #15 scope |
 | scripts/weekly_cycle.py | **Deferred** | Later BL |
 | scripts/validate_env.py | **Deferred** | Later BL |
@@ -88,5 +88,9 @@ Rationale: The config uses nested maps, lists of maps, and quoted strings. A han
 - templates/idea-body-template.md (new)
 - templates/roadmap-body-template.md (new)
 
+### Removed (not deferred)
+- build_loop_ops.py — depended on worktrees, removed from solo-os scope
+- worktree_ops.py — worktree management removed entirely from solo-os scope
+
 ### Deferred
-- build_loop_ops.py, worktree_ops.py, init_repo.py, weekly_cycle.py, validate_env.py, bootstrap_github_project.py
+- init_repo.py, weekly_cycle.py, validate_env.py, bootstrap_github_project.py

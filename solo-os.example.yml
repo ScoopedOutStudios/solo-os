@@ -25,24 +25,23 @@ repos:
     path: ./my-project                 # relative to this file's directory
     active: true
 
-validation:
-  required_repo_files:
-    - agent_generated/_index.md
-    - agent_generated/plans/LATEST.md
-  link_validation:
-    enabled: true
-    plan_pointer_file: agent_generated/plans/LATEST.md
-    required_url_substrings_any:
-      - github.com
-    severity: warning
+# validation:                          # optional — solo-os does not assume any folder structure
+#   required_repo_files:               # list of files that must exist in each active repo
+#     - README.md
+#   link_validation:
+#     enabled: true
+#     plan_pointer_file: path/to/pointer.md
+#     required_url_substrings_any:
+#       - github.com
+#     severity: warning                # "warning" or "error"
 
-cleanup:
-  report_path: reports/latest-cleanup-report.json
-  archive_root_name: archive
-  keep_file_names:
-    - _index.md
-    - README.md
-    - LATEST.md
+# cleanup:                             # optional — configure to enable cleanup-markdown command
+#   target_directory: docs             # directory within each repo to scan (omit to skip)
+#   report_path: reports/latest-cleanup-report.json
+#   archive_root_name: archive
+#   keep_file_names:
+#     - README.md
+#     - LATEST.md
 
 daily_triage:
   today_limit: 3

@@ -25,8 +25,9 @@ If we [action], then [expected outcome], because [reasoning].
 
 - Decision: Go | Park | Kill
 - Rationale:
-- If Go, recommended next step: Discovery | Roadmap item | Direct Build Loop
+- If Go, recommended next step: Roadmap item | Direct Build Loop
 
 ## Context
 
 - 2-3 bullets of relevant background.
+
