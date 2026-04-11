@@ -1,0 +1,50 @@
+# solo-os.yml — Solo OS workspace configuration
+# Copy this file to your workspace root and fill in your values.
+# This file should NOT be committed to the solo-os repo.
+# See: https://github.com/ScoopedOutStudios/solo-os
+
+github:
+  owner: your-org-or-username          # GitHub org or user that owns the project
+  owner_type: org                      # "org" or "user"
+  project:
+    number: 1                          # GitHub Projects (V2) number
+    title: My Planning Board           # human-readable name (for display only)
+  fields:
+    kind:
+      name: Kind
+      options: [Idea, Roadmap, "Build Loop"]
+    status:
+      name: Status
+      options: [Todo, Prioritized, Backlog, Blocked, "In Progress", Done]
+    stage:
+      name: Stage
+      options: [Inbox, Today, "This Week", Waiting]
+
+repos:
+  - id: my-project                     # short alias used in CLI commands
+    path: ./my-project                 # relative to this file's directory
+    active: true
+
+validation:
+  required_repo_files:
+    - agent_generated/_index.md
+    - agent_generated/plans/LATEST.md
+  link_validation:
+    enabled: true
+    plan_pointer_file: agent_generated/plans/LATEST.md
+    required_url_substrings_any:
+      - github.com
+    severity: warning
+
+cleanup:
+  report_path: reports/latest-cleanup-report.json
+  archive_root_name: archive
+  keep_file_names:
+    - _index.md
+    - README.md
+    - LATEST.md
+
+daily_triage:
+  today_limit: 3
+  this_week_limit: 7
+  max_build_loops_per_repo_today: 1

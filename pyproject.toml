@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solo-os"
+version = "0.1.0"
+description = "CLI toolkit for solo/small-team project governance on GitHub Projects V2"
+requires-python = ">=3.10"
+dependencies = ["pyyaml>=6.0"]
+
+[project.scripts]
+solo-os = "solo_os.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["solo_os*"]
+
+[tool.setuptools.package-data]
+solo_os = ["../templates/*.md"]
