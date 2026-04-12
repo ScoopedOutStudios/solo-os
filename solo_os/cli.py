@@ -170,7 +170,7 @@ def main() -> int:
             return 0
     except KeyboardInterrupt:
         return 130
-    except RuntimeError as exc:
+    except (RuntimeError, FileNotFoundError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
