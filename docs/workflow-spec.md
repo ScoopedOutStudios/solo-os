@@ -61,14 +61,16 @@ Shared values across all Kinds: `Todo`, `Prioritized`, `Backlog`, `Blocked`, `In
 
 ### Interpretation by Kind
 
-| Status | Idea | Roadmap | Build Loop |
-|--------|------|---------|------------|
-| Todo | Untriaged | - | - |
-| Prioritized | Worth near-term pursuit | Near-term committed | Next loop (Checkpoint A complete) |
-| Backlog | Parked for later | Later | - |
-| Blocked | Missing input | Waiting on dependency | Waiting on dependency/decision |
-| In Progress | Active evaluation | Active strategic focus | Active execution |
-| Done | Resolved (promoted or killed) | Outcome achieved or abandoned | Loop complete (merged, learning captured) |
+
+| Status      | Idea                          | Roadmap                       | Build Loop                                |
+| ----------- | ----------------------------- | ----------------------------- | ----------------------------------------- |
+| Todo        | Untriaged                     | -                             | -                                         |
+| Prioritized | Worth near-term pursuit       | Near-term committed           | Next loop (Checkpoint A complete)         |
+| Backlog     | Parked for later              | Later                         | -                                         |
+| Blocked     | Missing input                 | Waiting on dependency         | Waiting on dependency/decision            |
+| In Progress | Active evaluation             | Active strategic focus        | Active execution                          |
+| Done        | Resolved (promoted or killed) | Outcome achieved or abandoned | Loop complete (merged, learning captured) |
+
 
 ## State Transitions
 
@@ -168,26 +170,31 @@ A Roadmap item is **Done** when all its child Build Loops are complete and the o
 
 ## Kind Promotion
 
-| Action | Command | What happens |
-|--------|---------|-------------|
-| Idea → Roadmap | `solo-os gh-promote --repo R --issue N --kind Roadmap` | Updates title prefix to `[Roadmap]`, sets Kind=Roadmap, Status=Prioritized |
-| Roadmap → Build Loop | Manual issue creation | Create a new BL issue with parent linkage to the Roadmap item |
-| Direct to Build Loop | Manual issue creation | Create a BL issue with rationale in Parent Linkage section |
+
+| Action               | Command                                                | What happens                                                               |
+| -------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Idea → Roadmap       | `solo-os gh-promote --repo R --issue N --kind Roadmap` | Updates title prefix to `[Roadmap]`, sets Kind=Roadmap, Status=Prioritized |
+| Roadmap → Build Loop | Manual issue creation                                  | Create a new BL issue with parent linkage to the Roadmap item              |
+| Direct to Build Loop | Manual issue creation                                  | Create a BL issue with rationale in Parent Linkage section                 |
+
 
 ## Stage Semantics
 
 Stage is a planning-horizon field that tracks temporal focus, independent of Status. It applies to all Kinds.
 
-| Stage | Meaning | WIP Limit |
-|-------|---------|-----------|
-| Inbox | Captured but not triaged | - |
-| Today | Committed to advance today | 3 items across all repos |
-| This Week | Committed to advance this week | 7 items across all repos |
-| Waiting | Not urgent, parked, or blocked on external dependency | - |
+
+| Stage     | Meaning                                               | WIP Limit                |
+| --------- | ----------------------------------------------------- | ------------------------ |
+| Inbox     | Captured but not triaged                              | -                        |
+| Today     | Committed to advance today                            | 3 items across all repos |
+| This Week | Committed to advance this week                        | 7 items across all repos |
+| Waiting   | Not urgent, parked, or blocked on external dependency | -                        |
+
 
 Additional constraint: at most 1 Build Loop in `Stage = Today` per repo.
 
 Stage and Status are orthogonal:
+
 - **Status** answers "where is this in the execution lifecycle?"
 - **Stage** answers "when am I choosing to touch this?"
 
@@ -218,3 +225,4 @@ Build Loops are executed through one or more AI Agent plan-then-execute cycles, 
 - Do not expand scope mid-loop without revisiting Checkpoint A.
 - Do not use markdown files as active status boards — keep active state in GitHub.
 - Do not force child tasks by default — a Build Loop plus commits/PRs is usually sufficient.
+
