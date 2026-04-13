@@ -34,4 +34,3 @@ Brief description of the committed strategic bet or outcome.
 ## Context
 
 - 2-3 bullets of relevant background, discovery findings, or market context.
-

@@ -1,7 +1,7 @@
 # solo-os.yml — Solo OS workspace configuration
 # Copy this file to your workspace root and fill in your values.
 # This file should NOT be committed to the solo-os repo.
-# See: https://github.com/ScoopedOutStudios/solo-os
+# See: https://github.com/your-org-or-username/solo-os
 
 github:
   owner: your-org-or-username          # GitHub org or user that owns the project

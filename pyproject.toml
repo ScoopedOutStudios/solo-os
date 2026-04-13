@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "solo-os"
-version = "0.1.0"
+version = "0.2.0"
 description = "CLI toolkit for solo/small-team project governance on GitHub Projects V2"
+license = "MIT"
 requires-python = ">=3.10"
 dependencies = ["pyyaml>=6.0"]
 
@@ -16,4 +17,4 @@ solo-os = "solo_os.cli:main"
 include = ["solo_os*"]
 
 [tool.setuptools.package-data]
-solo_os = ["../templates/*.md"]
+solo_os = ["templates/*.md"]

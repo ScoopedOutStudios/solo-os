@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from importlib import resources
 from pathlib import Path
 
 
@@ -101,6 +100,23 @@ def _build_parser() -> argparse.ArgumentParser:
     cleanup.add_argument("--apply", action="store_true", help="Move cleanup candidates to archive")
     cleanup.add_argument("--repo", help="Optional repo id to scope cleanup")
 
+    # --- bl-review ---
+    bl_review = subparsers.add_parser("bl-review", help="Review a Build Loop issue for Checkpoint A readiness")
+    bl_review.add_argument("--repo", required=True, help="Repo alias or owner/name")
+    bl_review.add_argument("--issue", required=True, type=int, help="Build Loop issue number")
+    bl_review.add_argument("--format", choices=["table", "json"], default="table")
+    bl_review.add_argument("--color", choices=["auto", "always", "never"], default="auto")
+
+    # --- bl-status ---
+    bl_status = subparsers.add_parser("bl-status", help="Show open Build Loop issues across repos")
+    bl_status.add_argument("--repo", help="Optional repo alias or owner/name")
+    bl_status.add_argument("--limit", type=int, default=20, help="Maximum items to show")
+    bl_status.add_argument("--format", choices=["table", "json"], default="table")
+    bl_status.add_argument("--color", choices=["auto", "always", "never"], default="auto")
+
+    # --- weekly-cycle ---
+    subparsers.add_parser("weekly-cycle", help="Run weekly maintenance: sync-audit then cleanup-markdown")
+
     # --- build-loop-template ---
     blt = subparsers.add_parser("build-loop-template", help="Print the canonical Build Loop issue body template")
     blt.add_argument("--kind", choices=["idea", "roadmap", "build-loop"], default="build-loop",
@@ -118,7 +134,7 @@ def _template_path(kind: str) -> Path:
         "build-loop": "build-loop-body-template.md",
     }
     filename = template_names.get(kind, "build-loop-body-template.md")
-    pkg_dir = Path(__file__).resolve().parent.parent
+    pkg_dir = Path(__file__).resolve().parent
     return pkg_dir / "templates" / filename
 
 
@@ -157,6 +173,15 @@ def main() -> int:
         if args.command == "cleanup-markdown":
             from solo_os.commands.cleanup_markdown import handle_cleanup_markdown
             return handle_cleanup_markdown(args)
+        if args.command == "bl-review":
+            from solo_os.commands.build_loop import handle_bl_review
+            return handle_bl_review(args)
+        if args.command == "bl-status":
+            from solo_os.commands.build_loop import handle_bl_status
+            return handle_bl_status(args)
+        if args.command == "weekly-cycle":
+            from solo_os.commands.weekly_cycle import handle_weekly_cycle
+            return handle_weekly_cycle(args)
         if args.command == "build-loop-template":
             kind = getattr(args, "kind", "build-loop")
             tpl = _template_path(kind)
@@ -170,7 +195,7 @@ def main() -> int:
             return 0
     except KeyboardInterrupt:
         return 130
-    except (RuntimeError, FileNotFoundError) as exc:
+    except (RuntimeError, FileNotFoundError, ImportError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 

@@ -30,4 +30,3 @@ If we [action], then [expected outcome], because [reasoning].
 ## Context
 
 - 2-3 bullets of relevant background.
-
