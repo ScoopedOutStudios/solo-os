@@ -382,9 +382,9 @@ def _ensure_project_fields(owner: str, project_number: int) -> list[str]:
     return created
 
 
-def _repo_entry(mode: str, repo_name: str, repo_id_override: str | None, repo_path_override: str | None) -> dict[str, Any]:
+def _repo_entry(repo_name: str, repo_id_override: str | None, repo_path_override: str | None, *, is_inside_repo: bool) -> dict[str, Any]:
     repo_id = (repo_id_override or repo_name or "my-project").strip()
-    if mode == "single":
+    if is_inside_repo:
         repo_path = repo_path_override or "./"
     else:
         default_path = f"./{repo_name}" if repo_name else "./my-project"
@@ -552,6 +552,50 @@ def handle_doctor(args: argparse.Namespace) -> int:
                     fix="Install/authenticate gh and re-run verify.",
                 )
             )
+        for repo in loaded.get("repos", []):
+            repo_id = str(repo.get("id") or "")
+            if not repo.get("active", True):
+                continue
+            resolved = str(repo.get("_resolved_path") or repo.get("path") or "")
+            if not resolved:
+                results.append(
+                    CheckResult(
+                        name=f"repo:{repo_id}",
+                        status="WARN",
+                        detail=f"Repo '{repo_id}' has no path configured.",
+                        fix=f"Set a path for '{repo_id}' in solo-os.yml.",
+                    )
+                )
+                continue
+            repo_path = Path(resolved)
+            if not repo_path.is_dir():
+                results.append(
+                    CheckResult(
+                        name=f"repo:{repo_id}",
+                        status="FAIL",
+                        detail=f"Repo '{repo_id}' path does not exist: {resolved}",
+                        fix=f"Clone the repo or update the path in solo-os.yml.",
+                    )
+                )
+                continue
+            git_dir = repo_path / ".git"
+            if not git_dir.exists():
+                results.append(
+                    CheckResult(
+                        name=f"repo:{repo_id}",
+                        status="WARN",
+                        detail=f"Repo '{repo_id}' exists at {resolved} but is not a git repository.",
+                        fix=f"Run `git init` in {resolved} or update the path in solo-os.yml.",
+                    )
+                )
+            else:
+                results.append(
+                    CheckResult(
+                        name=f"repo:{repo_id}",
+                        status="PASS",
+                        detail=f"Repo '{repo_id}' is a valid git repository at {resolved}.",
+                    )
+                )
     except (config.ConfigNotFoundError, yaml.YAMLError) as exc:
         results.append(
             CheckResult(
@@ -621,6 +665,8 @@ def handle_init(args: argparse.Namespace) -> int:
             create = project_number <= 0
 
         if create:
+            if not args.yes and not args.project_title:
+                project_title = _prompt("Project name", default=project_title)
             try:
                 project = _create_project(owner, project_title)
             except RuntimeError as exc:
@@ -692,21 +738,13 @@ def handle_init(args: argparse.Namespace) -> int:
             ) from None
         raise
 
-    mode = str(args.mode or "").strip().lower()
-    if mode not in {"single", "multi"}:
-        if args.yes:
-            mode = "single"
-        else:
-            mode = _prompt("Setup mode: single or multi repo", default="single").lower()
-            if mode not in {"single", "multi"}:
-                mode = "single"
-
+    is_inside_repo = detected_repo != ""
     repo_name = detected_repo or "my-project"
     repo_entry = _repo_entry(
-        mode=mode,
         repo_name=repo_name,
         repo_id_override=args.repo_id,
         repo_path_override=args.repo_path,
+        is_inside_repo=is_inside_repo,
     )
 
     config_path = Path(args.config_path or (cwd / "solo-os.yml")).expanduser().resolve()
@@ -739,7 +777,6 @@ def handle_init(args: argparse.Namespace) -> int:
         "project_url": project_url,
         "created_project": created_project,
         "created_fields": created_fields,
-        "mode": mode,
         "config_path": str(config_path),
     }
 

@@ -140,9 +140,8 @@ solo-os init --yes --owner ScoopedOutStudios --project 7
 # Non-interactive — creates a new GitHub Project automatically
 solo-os init --yes --owner ScoopedOutStudios --project-title "Solo OS Planning"
 
-# Single-repo shortcut — run from inside a cloned repo
-cd ~/my-workspace/my-app
-solo-os init --mode single
+# Use @me to auto-detect your GitHub username
+solo-os init --owner @me
 ```
 
 ## Templates
