@@ -242,6 +242,166 @@ def _detect_git_remote(path: Path) -> tuple[str, str] | None:
     return _parse_github_remote(remote)
 
 
+@dataclass
+class DetectedRepo:
+    """A git repo discovered during workspace scan."""
+
+    name: str
+    path: str
+    remote_url: str
+    owner_repo: str
+
+    def as_entry(self, relative_to: Path) -> dict[str, Any]:
+        try:
+            rel = str(Path(self.path).relative_to(relative_to))
+            if rel == ".":
+                rel_path = "./"
+            elif not rel.startswith("./"):
+                rel_path = f"./{rel}"
+            else:
+                rel_path = rel
+        except ValueError:
+            rel_path = self.path
+        return {"id": self.name, "path": rel_path, "active": True}
+
+
+def _scan_workspace_repos(cwd: Path) -> list[DetectedRepo]:
+    """Scan cwd itself and its immediate subdirectories for git repos."""
+    repos: list[DetectedRepo] = []
+    candidates = [cwd] + sorted(
+        p for p in cwd.iterdir() if p.is_dir() and not p.name.startswith(".")
+    )
+    for candidate in candidates:
+        git_dir = candidate / ".git"
+        if not git_dir.exists():
+            continue
+        remote_info = _detect_git_remote(candidate)
+        if remote_info:
+            owner, repo_name = remote_info
+            owner_repo = f"{owner}/{repo_name}"
+        else:
+            owner_repo = ""
+            repo_name = candidate.name
+        repos.append(
+            DetectedRepo(
+                name=repo_name,
+                path=str(candidate),
+                remote_url="",
+                owner_repo=owner_repo,
+            )
+        )
+    return repos
+
+
+def _parse_github_url(url: str) -> tuple[str, str] | None:
+    """Parse a GitHub HTTPS or SSH URL into (owner, repo)."""
+    return _parse_github_remote(url)
+
+
+def _clone_repo(url: str, target_dir: Path) -> DetectedRepo:
+    """Clone a GitHub URL into target_dir and return a DetectedRepo."""
+    parsed = _parse_github_url(url)
+    if not parsed:
+        raise RuntimeError(
+            f"Could not parse GitHub URL: {url}\n"
+            "  Expected: https://github.com/owner/repo or git@github.com:owner/repo"
+        )
+    owner, repo_name = parsed
+    dest = target_dir / repo_name
+    if dest.exists():
+        raise RuntimeError(
+            f"Directory already exists: {dest}\n"
+            f"  If this repo is already cloned, it should have been detected automatically."
+        )
+    proc = _run(["git", "clone", url, str(dest)])
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"git clone failed: {proc.stderr.strip() or proc.stdout.strip()}"
+        )
+    return DetectedRepo(
+        name=repo_name,
+        path=str(dest),
+        remote_url=url,
+        owner_repo=f"{owner}/{repo_name}",
+    )
+
+
+def _collect_repos(cwd: Path, *, interactive: bool, repo_id_override: str | None, repo_path_override: str | None) -> list[dict[str, Any]]:
+    """Guided repo collection: detect, confirm, add-by-URL, return entries."""
+    detected = _scan_workspace_repos(cwd)
+
+    if not interactive:
+        if detected:
+            return [r.as_entry(cwd) for r in detected]
+        return [{"id": "my-project", "path": "./", "active": True}]
+
+    if repo_id_override or repo_path_override:
+        is_inside_repo = any(Path(r.path) == cwd for r in detected)
+        repo_name = detected[0].name if detected else "my-project"
+        entry = _repo_entry(
+            repo_name=repo_name,
+            repo_id_override=repo_id_override,
+            repo_path_override=repo_path_override,
+            is_inside_repo=is_inside_repo,
+        )
+        return [entry]
+
+    selected: list[DetectedRepo] = []
+
+    if detected:
+        print(f"\nFound {len(detected)} git repo(s) in {cwd}:")
+        for i, repo in enumerate(detected, 1):
+            suffix = f"  (origin: {repo.owner_repo})" if repo.owner_repo else ""
+            print(f"  [{i}] {repo.name}{suffix}")
+        print()
+
+        include_all = _prompt("Include all?", default="Y")
+        if include_all.lower() in {"y", "yes", ""}:
+            selected = list(detected)
+        else:
+            numbers = _prompt("Enter repo numbers to include (e.g. 1,3)")
+            for part in numbers.split(","):
+                part = part.strip()
+                if not part:
+                    continue
+                try:
+                    idx = int(part) - 1
+                    if 0 <= idx < len(detected):
+                        selected.append(detected[idx])
+                except ValueError:
+                    pass
+            if not selected:
+                print("No repos selected from detected list.")
+    else:
+        print(f"\nNo git repos detected in {cwd}.")
+
+    while True:
+        url = _prompt(
+            "Add a repo by GitHub URL? (paste URL or press Enter to finish)",
+            default="",
+        )
+        if not url:
+            break
+        try:
+            cloned = _clone_repo(url, cwd)
+            selected.append(cloned)
+            print(f"  Cloned {cloned.owner_repo} into {cloned.path}")
+        except RuntimeError as exc:
+            print(f"  Error: {exc}")
+
+    if not selected:
+        is_inside_repo = (cwd / ".git").exists()
+        repo_name = cwd.name if is_inside_repo else "my-project"
+        return [_repo_entry(
+            repo_name=repo_name,
+            repo_id_override=None,
+            repo_path_override=None,
+            is_inside_repo=is_inside_repo,
+        )]
+
+    return [r.as_entry(cwd) for r in selected]
+
+
 def _prompt(message: str, *, default: str | None = None) -> str:
     suffix = f" [{default}]" if default else ""
     value = input(f"{message}{suffix}: ").strip()
@@ -403,7 +563,7 @@ def _write_config(
     owner_type: str,
     project_number: int,
     project_title: str,
-    repo_entry: dict[str, Any],
+    repos: list[dict[str, Any]],
 ) -> None:
     payload = {
         "github": {
@@ -419,7 +579,7 @@ def _write_config(
                 "stage": {"name": "Stage", "options": REQUIRED_FIELDS["Stage"]},
             },
         },
-        "repos": [repo_entry],
+        "repos": repos,
         "daily_triage": {
             "today_limit": 3,
             "this_week_limit": 7,
@@ -738,13 +898,11 @@ def handle_init(args: argparse.Namespace) -> int:
             ) from None
         raise
 
-    is_inside_repo = detected_repo != ""
-    repo_name = detected_repo or "my-project"
-    repo_entry = _repo_entry(
-        repo_name=repo_name,
+    repos = _collect_repos(
+        cwd,
+        interactive=not args.yes,
         repo_id_override=args.repo_id,
         repo_path_override=args.repo_path,
-        is_inside_repo=is_inside_repo,
     )
 
     config_path = Path(args.config_path or (cwd / "solo-os.yml")).expanduser().resolve()
@@ -759,7 +917,7 @@ def handle_init(args: argparse.Namespace) -> int:
         owner_type=owner_type,
         project_number=project_number,
         project_title=project_title,
-        repo_entry=repo_entry,
+        repos=repos,
     )
 
     # Validate generated config can be parsed.
@@ -769,6 +927,7 @@ def handle_init(args: argparse.Namespace) -> int:
         raise RuntimeError("Generated config is invalid YAML.")
 
     project_url = str(view_payload.get("url") or _project_url(owner, owner_type, project_number))
+    repo_ids = [r.get("id", "") for r in repos]
     payload = {
         "owner": owner,
         "owner_type": owner_type,
@@ -777,13 +936,14 @@ def handle_init(args: argparse.Namespace) -> int:
         "project_url": project_url,
         "created_project": created_project,
         "created_fields": created_fields,
+        "repos": repos,
         "config_path": str(config_path),
     }
 
     if args.format == "json":
         print(json.dumps(payload, indent=2))
     else:
-        print("solo-os init complete.")
+        print("\nsolo-os init complete.")
         print(f"- Config written: {config_path}")
         print(f"- Owner: {owner} ({owner_type})")
         print(f"- Project: #{project_number} ({project_title})")
@@ -793,10 +953,10 @@ def handle_init(args: argparse.Namespace) -> int:
             print(f"- Fields created: {', '.join(created_fields)}")
         else:
             print("- Fields created: none (already present)")
+        print(f"- Repos: {', '.join(repo_ids)}")
         _print_view_guidance(project_url)
         print("\nNext steps:")
-        print("1) Review `solo-os.yml` for repo aliases/paths")
-        print("2) Run `solo-os verify`")
-        print("3) Run `solo-os gh-next` to pick the next item")
+        print("1) Run `solo-os verify` to confirm setup")
+        print("2) Run `solo-os gh-next` to pick the next item")
 
     return 0
