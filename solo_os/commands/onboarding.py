@@ -256,14 +256,50 @@ def _project_url(owner: str, owner_type: str, number: int) -> str:
     return f"https://github.com/orgs/{owner}/projects/{number}"
 
 
-def _detect_owner_type(owner: str) -> str:
+def _resolve_at_me() -> str:
+    """Resolve @me to the authenticated GitHub username."""
+    proc = _run(["gh", "api", "user", "--jq", ".login"])
+    if proc.returncode == 0 and proc.stdout.strip():
+        return proc.stdout.strip()
+    raise RuntimeError(
+        "Could not resolve @me to a GitHub username.\n"
+        "  Fix: Run `gh auth login` and try again."
+    )
+
+
+def _resolve_owner(raw: str) -> str:
+    """Normalize owner input: resolve @me, strip whitespace."""
+    value = raw.strip()
+    if value.lower() == "@me":
+        return _resolve_at_me()
+    return value
+
+
+def _validate_owner(owner: str) -> tuple[str, str]:
+    """Verify the owner exists on GitHub and return (owner, owner_type).
+
+    Raises RuntimeError with an actionable message if the owner cannot be found.
+    """
     org_probe = _run(["gh", "api", f"orgs/{owner}"])
     if org_probe.returncode == 0:
-        return "org"
+        return owner, "org"
     user_probe = _run(["gh", "api", f"users/{owner}"])
     if user_probe.returncode == 0:
-        return "user"
-    return "org"
+        return owner, "user"
+    raise RuntimeError(
+        f"'{owner}' is not a valid GitHub org or username.\n"
+        f"  Check the spelling, or use @me for your own account.\n"
+        f"  Example: solo-os init --owner my-org\n"
+        f"  Example: solo-os init --owner @me"
+    )
+
+
+def _detect_owner_type(owner: str) -> str:
+    try:
+        _, owner_type = _validate_owner(owner)
+        return owner_type
+    except RuntimeError:
+        return "org"
 
 
 def _init_prereq_failures() -> list[str]:
@@ -551,15 +587,19 @@ def handle_init(args: argparse.Namespace) -> int:
     detected = _detect_git_remote(cwd) or ("", "")
     detected_owner, detected_repo = detected
 
-    owner = str(args.owner or detected_owner).strip()
-    if not owner and not args.yes:
-        owner = _prompt("GitHub owner (org or user)", default=detected_owner or "")
-    if not owner:
+    raw_owner = str(args.owner or detected_owner).strip()
+    if not raw_owner and not args.yes:
+        raw_owner = _prompt(
+            "GitHub org or username (e.g. my-org, my-username, or @me)",
+            default=detected_owner or "",
+        )
+    if not raw_owner:
         raise RuntimeError("Missing owner. Provide --owner or run interactively.")
 
-    owner_type = str(args.owner_type or "").strip() or _detect_owner_type(owner)
-    if owner_type not in {"org", "user"}:
-        owner_type = "org"
+    owner = _resolve_owner(raw_owner)
+    owner, owner_type = _validate_owner(owner)
+    if args.owner_type and args.owner_type in {"org", "user"}:
+        owner_type = args.owner_type
 
     project_number = int(args.project) if args.project else 0
     project_title = str(args.project_title or "Solo OS Planning").strip()
@@ -586,10 +626,17 @@ def handle_init(args: argparse.Namespace) -> int:
             except RuntimeError as exc:
                 msg = str(exc)
                 if "permission" in msg.lower() or "createProjectV2" in msg:
+                    scopes = _gh_token_scopes()
+                    if "project" not in scopes:
+                        raise RuntimeError(
+                            "GitHub token is missing the 'project' scope.\n"
+                            "  Fix: gh auth refresh --scopes project\n"
+                            "  Then re-run: solo-os init"
+                        ) from None
                     raise RuntimeError(
-                        "GitHub token is missing the 'project' scope required to create projects.\n"
-                        "  Fix: gh auth refresh --scopes project\n"
-                        "  Then re-run: solo-os init"
+                        f"Cannot create a project under '{owner}'.\n"
+                        f"  Make sure '{owner}' is your GitHub username or an org you have admin access to.\n"
+                        f"  Tip: Use @me to auto-detect your username: solo-os init --owner @me"
                     ) from None
                 raise
             project_number = int(project["number"])
@@ -612,11 +659,18 @@ def handle_init(args: argparse.Namespace) -> int:
     except RuntimeError as exc:
         msg = str(exc)
         if "permission" in msg.lower() or "project" in msg.lower():
+            scopes = _gh_token_scopes()
+            if "project" not in scopes:
+                raise RuntimeError(
+                    f"Cannot access GitHub Project #{project_number} for '{owner}'.\n"
+                    "  Your token is missing the 'project' scope.\n"
+                    "  Fix: gh auth refresh --scopes project\n"
+                    "  Then re-run: solo-os init"
+                ) from None
             raise RuntimeError(
                 f"Cannot access GitHub Project #{project_number} for '{owner}'.\n"
-                "  If the project exists, make sure your token has the 'project' scope:\n"
-                "  Fix: gh auth refresh --scopes project\n"
-                "  Then re-run: solo-os init"
+                f"  Make sure '{owner}' owns project #{project_number} and you have access.\n"
+                f"  Verify at: https://github.com/{owner}?tab=projects"
             ) from None
         raise
     project_title = str(view_payload.get("title") or project_title)
@@ -625,10 +679,16 @@ def handle_init(args: argparse.Namespace) -> int:
     except RuntimeError as exc:
         msg = str(exc)
         if "permission" in msg.lower():
+            scopes = _gh_token_scopes()
+            if "project" not in scopes:
+                raise RuntimeError(
+                    "GitHub token is missing the 'project' scope required to manage project fields.\n"
+                    "  Fix: gh auth refresh --scopes project\n"
+                    "  Then re-run: solo-os init"
+                ) from None
             raise RuntimeError(
-                "GitHub token is missing the 'project' scope required to manage project fields.\n"
-                "  Fix: gh auth refresh --scopes project\n"
-                "  Then re-run: solo-os init"
+                f"Cannot manage fields on project #{project_number} for '{owner}'.\n"
+                f"  Make sure you have admin access to this project."
             ) from None
         raise
 
