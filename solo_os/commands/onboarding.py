@@ -63,30 +63,23 @@ def _status_rank(status: str) -> int:
     return 0
 
 
+_STATUS_ICON = {"PASS": "✓", "WARN": "!", "FAIL": "✗"}
+_STATUS_COLOR = {"PASS": ANSI_GREEN, "WARN": ANSI_YELLOW, "FAIL": ANSI_RED}
+
+
 def _format_doctor(results: list[CheckResult], output_format: str) -> str:
     if output_format == "json":
         return json.dumps([item.as_dict() for item in results], indent=2)
 
-    headers = ["check", "status", "detail", "fix"]
-    rows = [
-        {
-            "check": item.name,
-            "status": item.status,
-            "detail": item.detail,
-            "fix": item.fix,
-        }
-        for item in results
-    ]
-    widths = {header: len(header) for header in headers}
-    for row in rows:
-        for header in headers:
-            widths[header] = max(widths[header], len(str(row[header])))
-
     lines = []
-    lines.append("  ".join(header.ljust(widths[header]) for header in headers))
-    lines.append("  ".join("-" * widths[header] for header in headers))
-    for row in rows:
-        lines.append("  ".join(str(row[header]).ljust(widths[header]) for header in headers))
+    for item in results:
+        color = _STATUS_COLOR.get(item.status, "")
+        icon = _STATUS_ICON.get(item.status, " ")
+        status_str = paint(f"[{icon}] {item.status}", color, enabled=True)
+        lines.append(f"{status_str}  {item.name}")
+        lines.append(f"       {item.detail}")
+        if item.fix:
+            lines.append(paint(f"       Fix: {item.fix}", ANSI_YELLOW, enabled=True))
     return "\n".join(lines)
 
 
@@ -94,17 +87,11 @@ def _print_doctor_summary(results: list[CheckResult]) -> None:
     failures = sum(1 for item in results if item.status == "FAIL")
     warnings = sum(1 for item in results if item.status == "WARN")
     if failures:
-        print(paint(f"\nDoctor result: {failures} failing checks, {warnings} warnings.", ANSI_RED, enabled=True))
+        print(paint(f"\nResult: {failures} failing check(s), {warnings} warning(s).", ANSI_RED, enabled=True))
     elif warnings:
-        print(
-            paint(
-                f"\nDoctor result: no failing checks, {warnings} warnings.",
-                ANSI_YELLOW,
-                enabled=True,
-            )
-        )
+        print(paint(f"\nResult: all checks passed, {warnings} warning(s).", ANSI_YELLOW, enabled=True))
     else:
-        print(paint("\nDoctor result: all checks passed.", ANSI_GREEN, enabled=True))
+        print(paint("\nResult: all checks passed.", ANSI_GREEN, enabled=True))
 
 
 def _gh_is_authenticated() -> bool:
