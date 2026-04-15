@@ -135,6 +135,21 @@ def _build_parser() -> argparse.ArgumentParser:
     # --- weekly-cycle ---
     subparsers.add_parser("weekly-cycle", help="Run weekly maintenance: sync-audit then cleanup-markdown")
 
+    # --- install-agents ---
+    inst_agents = subparsers.add_parser("install-agents", help="Install agent specs to Cursor agents directory")
+    inst_agents.add_argument("--target", help="Target directory (default: ~/.cursor/agents)")
+    inst_agents.add_argument("--force", action="store_true", help="Overwrite existing files")
+
+    # --- install-skills ---
+    inst_skills = subparsers.add_parser("install-skills", help="Install skill specs to Cursor skills directory")
+    inst_skills.add_argument("--target", help="Target directory (default: ~/.cursor/skills)")
+    inst_skills.add_argument("--force", action="store_true", help="Overwrite existing files")
+
+    # --- install-commands ---
+    inst_cmds = subparsers.add_parser("install-commands", help="Install commands to project .cursor/commands/solo-os")
+    inst_cmds.add_argument("--target", help="Target directory (default: .cursor/commands/solo-os)")
+    inst_cmds.add_argument("--force", action="store_true", help="Overwrite existing files")
+
     # --- build-loop-template ---
     blt = subparsers.add_parser("build-loop-template", help="Print the canonical Build Loop issue body template")
     blt.add_argument("--kind", choices=["idea", "roadmap", "build-loop"], default="build-loop",
@@ -206,6 +221,15 @@ def main() -> int:
         if args.command == "weekly-cycle":
             from solo_os.commands.weekly_cycle import handle_weekly_cycle
             return handle_weekly_cycle(args)
+        if args.command == "install-agents":
+            from solo_os.commands.install import handle_install_agents
+            return handle_install_agents(args)
+        if args.command == "install-skills":
+            from solo_os.commands.install import handle_install_skills
+            return handle_install_skills(args)
+        if args.command == "install-commands":
+            from solo_os.commands.install import handle_install_commands
+            return handle_install_commands(args)
         if args.command == "build-loop-template":
             kind = getattr(args, "kind", "build-loop")
             tpl = _template_path(kind)
