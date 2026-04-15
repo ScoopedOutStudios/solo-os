@@ -825,12 +825,21 @@ def handle_init(args: argparse.Namespace) -> int:
     detected = _detect_git_remote(cwd) or ("", "")
     detected_owner, detected_repo = detected
 
-    raw_owner = str(args.owner or detected_owner).strip()
-    if not raw_owner and not args.yes:
+    default_owner = str(args.owner or detected_owner).strip()
+    if not default_owner:
+        try:
+            default_owner = _resolve_at_me()
+        except RuntimeError:
+            pass
+    if args.owner:
+        raw_owner = args.owner.strip()
+    elif not args.yes:
         raw_owner = _prompt(
-            "GitHub org or username (e.g. my-org, my-username, or @me)",
-            default=detected_owner or "",
+            "GitHub org or username",
+            default=default_owner or "",
         )
+    else:
+        raw_owner = default_owner
     if not raw_owner:
         raise RuntimeError("Missing owner. Provide --owner or run interactively.")
 
