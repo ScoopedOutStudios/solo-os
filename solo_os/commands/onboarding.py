@@ -207,7 +207,7 @@ def _project_check_from_config(loaded_config: dict[str, Any]) -> CheckResult:
                 f"Project is reachable but missing recommended options: "
                 f"{', '.join(missing_options)}."
             ),
-            fix="Run `solo-os init --force` to add missing options automatically.",
+            fix="Run `solo-os init` to add missing options automatically.",
         )
 
     return CheckResult(
@@ -849,6 +849,35 @@ def handle_doctor(args: argparse.Namespace) -> int:
     return 1 if any(item.status == "FAIL" for item in results) else 0
 
 
+def _repair_existing_config(config_path: Path, args: argparse.Namespace) -> int:
+    """Read existing config and ensure project fields are up to date."""
+    try:
+        with config_path.open(encoding="utf-8") as fh:
+            cfg = yaml.safe_load(fh) or {}
+    except Exception as exc:
+        raise RuntimeError(f"Could not read {config_path}: {exc}") from exc
+
+    gh = cfg.get("github") or {}
+    owner = gh.get("owner", "")
+    project_cfg = gh.get("project") or {}
+    project_number = int(project_cfg.get("number", 0))
+    if not owner or project_number <= 0:
+        print("Existing config does not contain owner/project info. Nothing to repair.")
+        return 0
+
+    print(f"Checking project fields for {owner} #{project_number}...")
+    try:
+        created_fields = _ensure_project_fields(owner, project_number)
+    except RuntimeError as exc:
+        raise RuntimeError(f"Could not repair project fields: {exc}") from exc
+
+    if created_fields:
+        print(f"Updated fields: {', '.join(created_fields)}")
+    else:
+        print("All fields and options are already up to date.")
+    return 0
+
+
 def handle_init(args: argparse.Namespace) -> int:
     prereq_failures = _init_prereq_failures()
     if prereq_failures:
@@ -866,8 +895,7 @@ def handle_init(args: argparse.Namespace) -> int:
         print(f"\n{config_path} already exists.")
         overwrite = _prompt("Overwrite it?", default="n")
         if overwrite.lower() not in {"y", "yes"}:
-            print("Aborted. Use --force to skip this check, or --config-path to write elsewhere.")
-            return 0
+            return _repair_existing_config(config_path, args)
         args.force = True
     detected = _detect_git_remote(cwd) or ("", "")
     detected_owner, detected_repo = detected
