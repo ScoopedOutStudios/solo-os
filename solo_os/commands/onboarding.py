@@ -788,6 +788,19 @@ def handle_init(args: argparse.Namespace) -> int:
         raise RuntimeError(f"Init prerequisites not met:{joined}")
 
     cwd = Path.cwd()
+
+    config_path = Path(args.config_path or (cwd / "solo-os.yml")).expanduser().resolve()
+    if config_path.exists() and not args.force:
+        if args.yes:
+            raise RuntimeError(
+                f"{config_path} already exists. Re-run with --force to overwrite."
+            )
+        print(f"\n{config_path} already exists.")
+        overwrite = _prompt("Overwrite it?", default="n")
+        if overwrite.lower() not in {"y", "yes"}:
+            print("Aborted. Use --force to skip this check, or --config-path to write elsewhere.")
+            return 0
+        args.force = True
     detected = _detect_git_remote(cwd) or ("", "")
     detected_owner, detected_repo = detected
 
@@ -904,12 +917,6 @@ def handle_init(args: argparse.Namespace) -> int:
         repo_id_override=args.repo_id,
         repo_path_override=args.repo_path,
     )
-
-    config_path = Path(args.config_path or (cwd / "solo-os.yml")).expanduser().resolve()
-    if config_path.exists() and not args.force:
-        raise RuntimeError(
-            f"{config_path} already exists. Re-run with --force to overwrite, or choose --config-path."
-        )
 
     _write_config(
         config_path,
