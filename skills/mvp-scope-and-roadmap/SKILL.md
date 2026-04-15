@@ -52,7 +52,7 @@ Convert validated customer evidence into a smallest-valuable product scope and d
 - `staff-engineer`: validate feasibility, sequencing, and technical risk.
 - `security-privacy-engineer`: review trust/privacy implications of scoped features.
 - `qa-release-manager`: verify release-readiness expectations for phased delivery.
-- `artifact-governance-manager`: enforce artifact lifecycle and placement rules.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful scope and sequencing decisions.

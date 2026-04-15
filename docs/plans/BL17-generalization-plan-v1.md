@@ -19,31 +19,37 @@ This plan documents per-file decisions for porting agent specs, skill specs, com
 
 Every ported file must replace:
 
-| Find | Replace with |
-|------|-------------|
-| `In ScoopedOut Studios repos, …` | `In repos managed by Solo OS, …` |
-| `ScoopedOut Studios` | Remove or replace with generic context |
-| `ScoopedOutStudios` (GitHub org) | `<owner>` or remove |
-| `sos-hq` (repo name) | Remove; use repo-relative paths or `docs/` |
-| `From the sos-hq repo root, prefer …` | `Prefer …` (no root assumption) |
-| `Datamural` / `Datamural.io` | Remove product-specific examples; use generic placeholders |
+
+| Find                                  | Replace with                                               |
+| ------------------------------------- | ---------------------------------------------------------- |
+| `In ScoopedOut Studios repos, …`      | `In repos managed by Solo OS, …`                           |
+| `ScoopedOut Studios`                  | Remove or replace with generic context                     |
+| `ScoopedOutStudios` (GitHub org)      | `<owner>` or remove                                        |
+| `sos-hq` (repo name)                  | Remove; use repo-relative paths or `docs/`                 |
+| `From the sos-hq repo root, prefer …` | `Prefer …` (no root assumption)                            |
+| `Datamural` / `Datamural.io`          | Remove product-specific examples; use generic placeholders |
+
 
 ### 1b. CLI path update
 
-| Find | Replace with |
-|------|-------------|
-| `python3 solo-os/scripts/solo_os.py` | `solo-os` |
-| `(from sos-hq repo root)` | Remove |
+
+| Find                                 | Replace with |
+| ------------------------------------ | ------------ |
+| `python3 solo-os/scripts/solo_os.py` | `solo-os`    |
+| `(from sos-hq repo root)`            | Remove       |
+
 
 ### 1c. Governance doc paths
 
-| Find | Replace with |
-|------|-------------|
-| `sos-hq/docs/governance/workflow-system.md` | `docs/governance/workflow-system.md` |
+
+| Find                                                      | Replace with                                       |
+| --------------------------------------------------------- | -------------------------------------------------- |
+| `sos-hq/docs/governance/workflow-system.md`               | `docs/governance/workflow-system.md`               |
 | `sos-hq/docs/governance/build-loop-and-release-rhythm.md` | `docs/governance/build-loop-and-release-rhythm.md` |
-| `sos-hq/docs/governance/artifact-governance-spec.md` | `docs/governance/artifact-governance-spec.md` |
-| `sos-hq/docs/governance/leadership-team.md` | `docs/governance/leadership-team.md` |
-| `sos-hq/docs/governance/backlog-and-papercut-sweep.md` | `docs/governance/backlog-and-papercut-sweep.md` |
+| `sos-hq/docs/governance/artifact-governance-spec.md`      | `docs/governance/artifact-governance-spec.md`      |
+| `sos-hq/docs/governance/leadership-team.md`               | `docs/governance/leadership-team.md`               |
+| `sos-hq/docs/governance/backlog-and-papercut-sweep.md`    | `docs/governance/backlog-and-papercut-sweep.md`    |
+
 
 ### 1d. Model version references
 
@@ -74,16 +80,18 @@ The shared boilerplate to generalize in every agent:
 
 ### 2b. Per-file special cases
 
-| File | Special action |
-|------|---------------|
-| `README.md` | Rewrite entirely for public solo-os context. Remove sync-cursor-assets.sh references, sos-hq framing. Add install-agents usage instructions. |
-| `agm.md` | Replace `studio-level repo (sos-hq)` with `hub repo` or `workspace root`. |
-| `cos.md` | Deepest coupling. Replace multiple `sos-hq/docs/governance/` paths (5+ unique docs). Reconcile papercut sweep GitHub-first vs markdown backlog note. |
-| `design.md` | Replace `Design system decisions that affect multiple products belong in sos-hq` with `…belong in the hub repo`. Remove Datamural if present. |
-| `guru.md` | Replace `For research that serves multiple products, place in sos-hq` with `…place in the hub repo`. |
-| `pm.md` | Remove doubled ScoopedOut reference in strategic roadmap section. |
-| `staff.md` | **Fix name inconsistency:** frontmatter says `name: staff-eng`, but all other specs refer to it as `staff`. Normalize to `staff` everywhere. |
-| `qa.md` | Add `or equivalent per repo` after npm-specific pre-commit examples. |
+
+| File        | Special action                                                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `README.md` | Rewrite entirely for public solo-os context. Remove sync-cursor-assets.sh references, sos-hq framing. Add install-agents usage instructions.         |
+| `agm.md`    | Replace `studio-level repo (sos-hq)` with `hub repo` or `workspace root`.                                                                            |
+| `cos.md`    | Deepest coupling. Replace multiple `sos-hq/docs/governance/` paths (5+ unique docs). Reconcile papercut sweep GitHub-first vs markdown backlog note. |
+| `design.md` | Replace `Design system decisions that affect multiple products belong in sos-hq` with `…belong in the hub repo`. Remove Datamural if present.        |
+| `guru.md`   | Replace `For research that serves multiple products, place in sos-hq` with `…place in the hub repo`.                                                 |
+| `pm.md`     | Remove doubled ScoopedOut reference in strategic roadmap section.                                                                                    |
+| `staff.md`  | **Fix name inconsistency:** frontmatter says `name: staff-eng`, but all other specs refer to it as `staff`. Normalize to `staff` everywhere.         |
+| `qa.md`     | Add `or equivalent per repo` after npm-specific pre-commit examples.                                                                                 |
+
 
 ---
 
@@ -113,11 +121,13 @@ competitive-intelligence-brief, market-and-audience-research, technical-research
 
 ### 3c. Per-file special cases
 
-| File | Special action |
-|------|---------------|
-| `build-loop-and-release-rhythm/SKILL.md` | Extra bl-* CLI line: replace `python3 solo-os/scripts/solo_os.py bl-review\|...` with `solo-os bl-review\|...`. Replace `Default to simple mode for active Build Loop execution in ScoopedOut repos` with `Default to simple mode`. Remove `.cursorrules` reference (BL #18 territory). |
-| `idea-triage/SKILL.md` | **Heaviest coupling.** Remove entire Repo Creation Protocol that references `ScoopedOutStudios` org, `sos-hq` artifact migration, and `sos.code-workspace`. Replace with generic: "Follow the Repo Creation Protocol in `docs/governance/artifact-governance-spec.md` if applicable." |
-| `design-inspiration/SKILL.md` | Replace all `Datamural.io` / `Datamural` references with generic `your product` or `the target product`. Keep curated URL tables as-is. |
+
+| File                                     | Special action                                                                                                                                                                                                                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `build-loop-and-release-rhythm/SKILL.md` | Extra bl-* CLI line: replace `python3 solo-os/scripts/solo_os.py bl-review|...` with `solo-os bl-review|...`. Replace `Default to simple mode for active Build Loop execution in ScoopedOut repos` with `Default to simple mode`. Remove `.cursorrules` reference (BL #18 territory). |
+| `idea-triage/SKILL.md`                   | **Heaviest coupling.** Remove entire Repo Creation Protocol that references `ScoopedOutStudios` org, `sos-hq` artifact migration, and `sos.code-workspace`. Replace with generic: "Follow the Repo Creation Protocol in `docs/governance/artifact-governance-spec.md` if applicable." |
+| `design-inspiration/SKILL.md`            | Replace all `Datamural.io` / `Datamural` references with generic `your product` or `the target product`. Keep curated URL tables as-is.                                                                                                                                               |
+
 
 ### 3d. reference.md files
 
@@ -133,12 +143,14 @@ Both `solopreneur-business-plan/reference.md` and `pr-faq-generator/reference.md
 
 ### 4a. Changes needed
 
-| File | Change |
-|------|--------|
-| `README.md` | Rewrite for public solo-os context. Reference `solo-os install-commands` for setup. |
+
+| File              | Change                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `README.md`       | Rewrite for public solo-os context. Reference `solo-os install-commands` for setup.            |
 | `daily-triage.md` | Replace `sos-hq/docs/governance/workflow-system.md` with `docs/governance/workflow-system.md`. |
-| `idea-triage.md` | Replace `<repo-or-sos-hq>` with `<repo>`. |
-| All others | No ScoopedOut-specific content found. Port as-is. |
+| `idea-triage.md`  | Replace `<repo-or-sos-hq>` with `<repo>`.                                                      |
+| All others        | No ScoopedOut-specific content found. Port as-is.                                              |
+
 
 ### 4b. Prompts
 
@@ -193,21 +205,35 @@ solo-os install-commands [--target .cursor/commands/solo-os] [--force]
 
 ## 6. New/updated README files
 
-| Location | Content |
-|----------|---------|
-| `solo-os/agents/README.md` | What agents are, how they work, `solo-os install-agents` usage, list of included agents with one-line descriptions |
-| `solo-os/skills/README.md` | What skills are, how they work, `solo-os install-skills` usage, list of included skills with one-line descriptions |
-| `solo-os/commands/README.md` | What commands are, how they work, `solo-os install-commands` usage, list of included commands |
+
+| Location                     | Content                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `solo-os/agents/README.md`   | What agents are, how they work, `solo-os install-agents` usage, list of included agents with one-line descriptions |
+| `solo-os/skills/README.md`   | What skills are, how they work, `solo-os install-skills` usage, list of included skills with one-line descriptions |
+| `solo-os/commands/README.md` | What commands are, how they work, `solo-os install-commands` usage, list of included commands                      |
+
 
 ---
 
 ## 7. Validation checklist
 
-- [ ] `grep -r 'ScoopedOut\|sos-hq\|Datamural' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
-- [ ] `grep -r 'python3 solo-os/scripts/solo_os.py' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
-- [ ] `grep -r 'sos\.code-workspace' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
-- [ ] `solo-os install-agents` copies all agent specs to target directory
-- [ ] `solo-os install-skills` copies all skill folders to target directory
-- [ ] `solo-os install-commands` copies all commands to target directory
-- [ ] Each generalized spec reads coherently for a non-ScoopedOutStudios user
-- [ ] No personal or business-sensitive content in any ported file
+- `grep -r 'ScoopedOut\|sos-hq\|Datamural' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
+- `grep -r 'python3 solo-os/scripts/solo_os.py' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
+- `grep -r 'sos\.code-workspace' solo-os/agents/ solo-os/skills/ solo-os/commands/` returns zero matches
+- `solo-os install-agents` copies all agent specs to target directory
+- `solo-os install-skills` copies all skill folders to target directory
+- `solo-os install-commands` copies all commands to target directory
+- Each generalized spec reads coherently for a non-ScoopedOutStudios user
+- No personal or business-sensitive content in any ported file
+
+---
+
+## 8. Post-port cleanup: artifact governance references
+
+**Decision (applied during BL17 execution):**
+
+- Removed `agm.md` (Artifact Governance Manager) agent. Its role assumed a formal `docs/governance/artifact-governance-spec.md` that solo-os does not ship. The core ideas (versioning, draft-before-approved, no silent overwrites) are now expressed as lightweight inline rules in each agent's Artifact Governance Responsibilities section.
+- Replaced all `docs/governance/artifact-governance-spec.md` references across 9 agent specs and 14 skill files with self-contained inline metadata requirements.
+- Removed all `agm` and `artifact-governance-manager` handoff references from collaboration sections.
+- Validation: `grep -r 'artifact-governance-spec\|artifact-governance-manager\|agm' agents/ skills/ commands/` returns zero matches
+

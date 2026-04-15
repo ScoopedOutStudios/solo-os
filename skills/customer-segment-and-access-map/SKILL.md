@@ -44,7 +44,7 @@ Turn a triaged idea into an actionable customer access plan so discovery can run
 - Primary folder: `agent_generated/discovery/`
 - Optional cross-link: originating triage record in `agent_generated/ideas/`
 - Artifact class: `decision` for final segment/access strategy
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material changes require new version + `supersedes`.
@@ -53,7 +53,7 @@ Turn a triaged idea into an actionable customer access plan so discovery can run
 ## Sub-agent Handoffs
 - `product-manager`: validate segment choice against roadmap and value proposition.
 - `growth-operator`: optimize channel strategy and response conversion.
-- `artifact-governance-manager`: validate placement, metadata, and lifecycle.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 - `cos`: resolve cross-functional conflicts or blocked recruitment decisions.
 
 ## Depth and Token Guidance

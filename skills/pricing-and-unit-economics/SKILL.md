@@ -51,7 +51,7 @@ Ensure product decisions remain economically viable at solopreneur scale.
 - `product-manager`: validate customer value vs pricing tradeoffs.
 - `growth-operator`: align acquisition/activation assumptions with economics model.
 - `staff-engineer`: assess cost-to-serve implications of technical scope.
-- `artifact-governance-manager`: enforce metadata, versioning, and canonical pointer integrity.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 - `cos`: resolve cross-functional tradeoff conflicts.
 
 ## Depth and Token Guidance

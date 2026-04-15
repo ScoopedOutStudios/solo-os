@@ -61,7 +61,7 @@ Generate alternative problem framings that unlock new solution spaces, user segm
 ## Artifact Rules
 - Primary folder: `agent_generated/discovery/` (reframings are pre-validation).
 - Artifact class: `decision` when the reframing changes strategic direction, `ephemeral` for exploratory drafts.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -72,7 +72,7 @@ Generate alternative problem framings that unlock new solution spaces, user segm
 - `idea-triage`: if reframing produces a substantially new idea, run it through triage.
 - `customer-discovery-interview`: when the recommended reframing needs customer validation.
 - `product-manager`: when reframing implies a strategic pivot or roadmap change.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/version validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1050-1800 words for meaningful reframing with supporting rationale.

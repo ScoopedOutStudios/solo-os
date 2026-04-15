@@ -77,7 +77,7 @@ Adapt source selection based on the specific market and geography.
 ## Artifact Rules
 - Primary folder: `agent_generated/discovery/` or `agent_generated/economics/` (if supporting pricing/viability).
 - Artifact class: `decision` when the analysis influences market entry or pricing decisions.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Every data point must have source attribution with publication date.
@@ -89,7 +89,7 @@ Adapt source selection based on the specific market and geography.
 - `customer-segment-and-access-map` (skill): receives audience demographics and behavior data.
 - `opportunity-scanner` (skill): receives market size and trend data for opportunity ranking.
 - Optionally `growth-operator`: when channel/audience data is for experiment design and user requests growth review.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/metadata validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful market analysis.

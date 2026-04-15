@@ -138,7 +138,7 @@ Use only these three by default. Add more only for high-risk work.
   - `agent_generated/experiments/` for outcome metrics/learning decisions
   - `agent_generated/economics/` when viability assumptions shift
 - Artifact class: `decision` for iteration plans and gate outcomes
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material changes require new version + `supersedes`.
@@ -152,7 +152,7 @@ Use only these three by default. Add more only for high-risk work.
 - `sec`: trust/privacy checks for sensitive surfaces.
 - `pm`: scope discipline and outcome alignment.
 - Optionally invoke `growth` for post-release metrics when the product has meaningful funnel data and the founder wants a growth readout.
-- cos runs the artifact governance checklist per spec; optionally invoke `agm` for dedicated reviews.
+- cos runs the artifact governance checklist (metadata, placement, version) before final approval.
 
 ### Routing by risk
 

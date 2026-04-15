@@ -67,7 +67,7 @@ Adapt source selection based on the specific domain. These are starting points, 
 ## Artifact Rules
 - Primary folder: `agent_generated/discovery/` (or `agent_generated/ideas/` if pre-triage).
 - Artifact class: `decision` when the analysis influences product direction.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -79,7 +79,7 @@ Adapt source selection based on the specific domain. These are starting points, 
 - `product-manager`: receives positioning context for roadmap decisions.
 - Optionally `growth-operator`: when brief feeds positioning experiments and user requests growth review.
 - `pricing-and-unit-economics` (skill): receives pricing comparisons as input.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/version validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful competitive analysis.

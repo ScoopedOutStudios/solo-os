@@ -31,7 +31,7 @@ Decide quickly whether an idea should move to discovery now, be parked, or be ki
 3. Identify top assumptions and biggest unknown.
 4. Decide: `Go`, `Park`, or `Kill`.
 5. If `Go`, create a dedicated product repo before any discovery work:
-   - Follow the Repo Creation Protocol in `docs/governance/artifact-governance-spec.md` if applicable.
+   - Follow the repo creation protocol if applicable.
 6. If `Go`, hand off to `customer-discovery-interview`.
 
 ## Required Output
@@ -43,7 +43,7 @@ Decide quickly whether an idea should move to discovery now, be parked, or be ki
 ## Artifact Rules
 - Primary folder: `agent_generated/ideas/`
 - Artifact class: usually `decision` (or `ephemeral` for scratch notes)
-- If decision-impacting, include required metadata from `docs/governance/artifact-governance-spec.md`.
+- If decision-impacting, include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -51,7 +51,7 @@ Decide quickly whether an idea should move to discovery now, be parked, or be ki
 
 ## Sub-agent Handoffs
 - `product-manager`: confirm roadmap fit and priority.
-- `artifact-governance-manager`: validate artifact class, placement, and versioning.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 - `cos`: only if cross-functional conflicts need arbitration.
 
 ## Depth and Token Guidance

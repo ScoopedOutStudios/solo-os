@@ -61,7 +61,7 @@ Adapt source selection based on the specific technology domain.
 ## Artifact Rules
 - Primary folder: `agent_generated/plans/` (if supporting build decisions) or `agent_generated/discovery/` (if exploratory).
 - Artifact class: `decision` when the analysis directly influences architecture or stack choices.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Every technical claim must have source attribution.
@@ -72,7 +72,7 @@ Adapt source selection based on the specific technology domain.
 - `security-privacy-engineer`: receives security-relevant findings (CVEs, vulnerability history).
 - `solution-probe-poc` (skill): receives technical options to inform POC technology choices.
 - `build-loop-and-release-rhythm` (skill): receives technical context for implementation planning.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/version validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful technical comparison.

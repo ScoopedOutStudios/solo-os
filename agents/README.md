@@ -20,7 +20,6 @@ Copy all `.md` files from this directory to `~/.cursor/agents/`.
 
 | Name | Description |
 |------|-------------|
-| `agm` | Artifact Governance Manager — enforces order, quality, traceability, and lifecycle controls for planning and operating artifacts. |
 | `bt` | Big Thinker — visionary product thinker and creative strategist for ideation, opportunity spotting, and problem reframing. |
 | `cos` | Chief of Staff — cross-functional orchestrator that routes work, resolves conflicts, and produces execution-ready plans. |
 | `design` | Design Lead — UI/UX specialist that reviews and elevates visual design, interaction quality, usability, and brand consistency. |

@@ -66,7 +66,7 @@ Systematically scan a domain for user behavior trends, technology shifts, compet
 ## Artifact Rules
 - Primary folder: `agent_generated/ideas/`
 - Artifact class: `decision` for opportunity briefs that influence what to pursue next.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -76,7 +76,7 @@ Systematically scan a domain for user behavior trends, technology shifts, compet
 - `big-thinker`: primary agent that drives this skill — provides domain context and creative lens.
 - `idea-triage`: formal Go/Park/Kill scoring for top-ranked opportunities.
 - `product-manager`: roadmap fit and strategic alignment check.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/version validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful landscape analysis and opportunity ranking.

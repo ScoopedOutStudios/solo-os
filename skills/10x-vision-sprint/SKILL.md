@@ -65,7 +65,7 @@ Imagine the most ambitious possible solution to a validated problem, distill the
 ## Artifact Rules
 - Primary folder: `agent_generated/plans/` (vision documents inform roadmap).
 - Artifact class: `decision` when the vision shapes strategic direction and MVP scope.
-- Include required metadata from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -78,7 +78,7 @@ Imagine the most ambitious possible solution to a validated problem, distill the
 - `product-manager`: for roadmap alignment and staged delivery planning.
 - `staff-engineer`: for feasibility assessment of technically ambitious vision elements.
 - `solution-probe-poc`: when the core magic needs a quick prototype to validate desirability.
-- Apply artifact governance per spec; optionally invoke `artifact-governance-manager` for placement/version validation.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for meaningful vision development and backward reasoning.

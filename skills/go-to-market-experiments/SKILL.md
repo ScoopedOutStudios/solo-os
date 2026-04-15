@@ -52,7 +52,7 @@ Run disciplined experiments that improve growth outcomes and reduce go-to-market
 - `security-privacy-engineer`: validate privacy-safe instrumentation and data handling.
 - `qa-release-manager`: validate safe rollout/rollback for experiment changes.
 - Optionally invoke `growth-operator` for experiment prioritization and funnel strategy when the user requests dedicated growth review.
-- Apply artifact governance per spec (metadata, placement, version); optionally invoke `artifact-governance-manager` for canonical promotion.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for experiment design and interpretation.

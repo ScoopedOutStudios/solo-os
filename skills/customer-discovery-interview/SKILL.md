@@ -50,7 +50,7 @@ Validate whether the target customer has a real, urgent problem worth solving no
 - `product-manager`: validate customer-value framing and roadmap relevance.
 - `growth-operator`: shape testable demand/activation hypotheses.
 - `pricing-and-unit-economics` skill or `growth-operator`: if willingness-to-pay signal is central.
-- `artifact-governance-manager`: enforce placement, metadata, lifecycle.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for discovery synthesis and recommendations.

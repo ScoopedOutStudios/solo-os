@@ -43,7 +43,7 @@ Create a fast, disposable proof-of-concept to validate core solution assumptions
 - Primary folder: `agent_generated/discovery/` (solution validation readout)
 - Optional cross-link: `agent_generated/ideas/` to originating triage decision
 - Artifact class: `decision` for readouts; `ephemeral` for rough build notes
-- Include required metadata for decision/canonical docs from `docs/governance/artifact-governance-spec.md`.
+- Include metadata header for decision/canonical docs: title, artifact_type, status (draft/approved/superseded), version, owner, created_at.
 - May create/edit `draft` artifacts only.
 - Never overwrite `approved` artifacts in place.
 - Material updates require new version + `supersedes`.
@@ -53,7 +53,7 @@ Create a fast, disposable proof-of-concept to validate core solution assumptions
 - `product-manager`: verify customer value and roadmap relevance of findings.
 - `staff-engineer`: advise on minimal scope and feasibility constraints.
 - `security-privacy-engineer`: ensure probe avoids risky data collection/exposure.
-- `artifact-governance-manager`: validate placement, metadata, and lifecycle.
+- Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 - `cos`: arbitrate if specialist recommendations conflict.
 
 ## Depth and Token Guidance
