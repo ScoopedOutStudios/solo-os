@@ -95,6 +95,25 @@ def _build_parser() -> argparse.ArgumentParser:
     # --- sync-audit ---
     subparsers.add_parser("sync-audit", help="Run local sync audit checks")
 
+    # --- verify ---
+    verify = subparsers.add_parser("verify", help="Validate environment, config, and project setup")
+    verify.add_argument("--path", default=".", help="Directory to start config discovery from")
+    verify.add_argument("--format", choices=["table", "json"], default="table")
+
+    # --- init ---
+    init_cmd = subparsers.add_parser("init", help="Guided setup for solo-os.yml and GitHub Project fields")
+    init_cmd.add_argument("--yes", action="store_true", help="Non-interactive mode using defaults")
+    init_cmd.add_argument("--owner", help="GitHub owner (org or user)")
+    init_cmd.add_argument("--owner-type", choices=["org", "user"], help="Owner type override")
+    init_cmd.add_argument("--project", type=int, help="Existing GitHub Project number")
+    init_cmd.add_argument("--project-title", default="Solo OS Planning", help="Project title when creating")
+    init_cmd.add_argument("--mode", choices=["single", "multi"], help="Single-repo or multi-repo setup")
+    init_cmd.add_argument("--repo-id", help="Repo alias to write into solo-os.yml")
+    init_cmd.add_argument("--repo-path", help="Repo path to write into solo-os.yml")
+    init_cmd.add_argument("--config-path", help="Output path for generated solo-os.yml")
+    init_cmd.add_argument("--force", action="store_true", help="Overwrite existing config file")
+    init_cmd.add_argument("--format", choices=["table", "json"], default="table")
+
     # --- cleanup-markdown ---
     cleanup = subparsers.add_parser("cleanup-markdown", help="Archive redundant markdown artifacts")
     cleanup.add_argument("--apply", action="store_true", help="Move cleanup candidates to archive")
@@ -170,6 +189,12 @@ def main() -> int:
         if args.command == "sync-audit":
             from solo_os.commands.sync_audit import handle_sync_audit
             return handle_sync_audit()
+        if args.command == "verify":
+            from solo_os.commands.onboarding import handle_doctor
+            return handle_doctor(args)
+        if args.command == "init":
+            from solo_os.commands.onboarding import handle_init
+            return handle_init(args)
         if args.command == "cleanup-markdown":
             from solo_os.commands.cleanup_markdown import handle_cleanup_markdown
             return handle_cleanup_markdown(args)
