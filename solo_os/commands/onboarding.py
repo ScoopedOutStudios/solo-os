@@ -44,8 +44,8 @@ class CheckResult:
         }
 
 
-def _run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(args, cwd=cwd, text=True, capture_output=True, check=False)
+def _run(args: list[str], cwd: Path | None = None, input_text: str | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(args, cwd=cwd, text=True, capture_output=True, check=False, input=input_text)
 
 
 def _run_git_text(args: list[str], cwd: Path) -> str:
@@ -207,7 +207,7 @@ def _project_check_from_config(loaded_config: dict[str, Any]) -> CheckResult:
                 f"Project is reachable but missing recommended options: "
                 f"{', '.join(missing_options)}."
             ),
-            fix="Add missing options in GitHub Project field settings.",
+            fix="Run `solo-os init --force` to add missing options automatically.",
         )
 
     return CheckResult(
@@ -510,11 +510,51 @@ def _create_project(owner: str, title: str) -> dict[str, Any]:
     )
 
 
-def _field_exists(fields_payload: dict[str, Any], field_name: str) -> bool:
+_OPTION_COLORS = ["GRAY", "BLUE", "GREEN", "YELLOW", "ORANGE", "RED", "PINK", "PURPLE"]
+
+
+def _find_field(fields_payload: dict[str, Any], field_name: str) -> dict[str, Any] | None:
     for field in fields_payload.get("fields", []):
         if str(field.get("name") or "") == field_name:
-            return True
-    return False
+            return field
+    return None
+
+
+def _add_missing_options(field_id: str, existing_options: list[dict[str, Any]], required_names: list[str]) -> list[str]:
+    """Add missing options to an existing single-select field via GraphQL. Returns names added."""
+    existing_names = {opt.get("name", "") for opt in existing_options}
+    missing = [name for name in required_names if name not in existing_names]
+    if not missing:
+        return []
+
+    all_options: list[dict[str, str]] = []
+    for opt in existing_options:
+        all_options.append({
+            "name": opt["name"],
+            "color": opt.get("color", "GRAY"),
+            "description": opt.get("description", ""),
+        })
+    color_idx = len(all_options)
+    for name in missing:
+        all_options.append({
+            "name": name,
+            "color": _OPTION_COLORS[color_idx % len(_OPTION_COLORS)],
+            "description": "",
+        })
+        color_idx += 1
+
+    query = (
+        "mutation($fieldId: ID!, $opts: [ProjectV2SingleSelectFieldOptionInput!]!) {"
+        "  updateProjectV2Field(input: { fieldId: $fieldId, singleSelectOptions: $opts }) {"
+        "    projectV2Field { ... on ProjectV2SingleSelectField { id } }"
+        "  }"
+        "}"
+    )
+    body = json.dumps({"query": query, "variables": {"fieldId": field_id, "opts": all_options}})
+    proc = _run(["gh", "api", "graphql", "--input", "-"], input_text=body)
+    if proc.returncode != 0:
+        raise RuntimeError(f"Failed to update field options: {proc.stderr.strip() or proc.stdout.strip()}")
+    return missing
 
 
 def _ensure_project_fields(owner: str, project_number: int) -> list[str]:
@@ -530,8 +570,15 @@ def _ensure_project_fields(owner: str, project_number: int) -> list[str]:
             "json",
         ]
     )
-    for field_name, options in REQUIRED_FIELDS.items():
-        if _field_exists(fields_payload, field_name):
+    for field_name, required_options in REQUIRED_FIELDS.items():
+        existing_field = _find_field(fields_payload, field_name)
+        if existing_field:
+            field_id = existing_field.get("id", "")
+            existing_opts = existing_field.get("options") or []
+            if field_id and existing_opts:
+                added = _add_missing_options(field_id, existing_opts, required_options)
+                if added:
+                    created.append(f"{field_name} (+{', '.join(added)})")
             continue
         run_gh_text(
             [
@@ -545,7 +592,7 @@ def _ensure_project_fields(owner: str, project_number: int) -> list[str]:
                 "--data-type",
                 "SINGLE_SELECT",
                 "--single-select-options",
-                ",".join(options),
+                ",".join(required_options),
             ]
         )
         created.append(field_name)
