@@ -474,6 +474,27 @@ def _init_prereq_failures() -> list[str]:
     return failures
 
 
+def _list_projects(owner: str) -> list[dict[str, Any]]:
+    """Fetch open GitHub Projects V2 for an owner. Returns list of {number, title, item_count, url}."""
+    try:
+        payload = run_gh_json(
+            ["project", "list", "--owner", owner, "--format", "json"]
+        )
+    except RuntimeError:
+        return []
+    results: list[dict[str, Any]] = []
+    for proj in payload.get("projects", []):
+        if proj.get("closed"):
+            continue
+        results.append({
+            "number": proj.get("number", 0),
+            "title": proj.get("title", ""),
+            "item_count": (proj.get("items") or {}).get("totalCount", 0),
+            "url": proj.get("url", ""),
+        })
+    return results
+
+
 def _create_project(owner: str, title: str) -> dict[str, Any]:
     return run_gh_json(
         [
@@ -819,27 +840,58 @@ def handle_init(args: argparse.Namespace) -> int:
         owner_type = args.owner_type
 
     project_number = int(args.project) if args.project else 0
-    project_title = str(args.project_title or "Solo OS Planning").strip()
+    default_title = str(args.project_title or "Solo OS Planning").strip()
+    project_title = default_title
     created_project = False
 
     if project_number <= 0:
+        existing = _list_projects(owner)
+
         if args.yes:
-            create = True
-        else:
-            entered = _prompt(
-                "Existing project number (leave blank to create a new project)",
-                default="",
-            )
-            if entered:
+            # Non-interactive: auto-select or create
+            if not existing:
+                create = True
+            elif len(existing) == 1:
+                project_number = existing[0]["number"]
+                project_title = existing[0]["title"]
+                create = False
+            else:
+                title_match = next(
+                    (p for p in existing if p["title"] == default_title), None
+                )
+                pick = title_match or existing[0]
+                project_number = pick["number"]
+                project_title = pick["title"]
+                create = False
+        elif existing:
+            print(f"\nFound {len(existing)} existing project(s) for {owner}:")
+            for i, proj in enumerate(existing, 1):
+                print(f"  [{i}] {proj['title']:<30} (#{proj['number']}, {proj['item_count']} items)")
+            print("  [+] Create a new project")
+            print()
+            choice = _prompt("Select a project", default="1")
+            if choice.strip() == "+":
+                create = True
+            else:
                 try:
-                    project_number = int(entered)
-                except ValueError as exc:
-                    raise RuntimeError(f"Invalid project number: {entered}") from exc
-            create = project_number <= 0
+                    idx = int(choice) - 1
+                    if 0 <= idx < len(existing):
+                        project_number = existing[idx]["number"]
+                        project_title = existing[idx]["title"]
+                        create = False
+                    else:
+                        raise ValueError("out of range")
+                except ValueError:
+                    raise RuntimeError(
+                        f"Invalid selection: {choice}. Enter a number 1-{len(existing)} or '+' to create."
+                    )
+        else:
+            print(f"\nNo existing projects found for {owner}.")
+            create = True
 
         if create:
             if not args.yes and not args.project_title:
-                project_title = _prompt("Project name", default=project_title)
+                project_title = _prompt("Project name", default=default_title)
             try:
                 project = _create_project(owner, project_title)
             except RuntimeError as exc:
