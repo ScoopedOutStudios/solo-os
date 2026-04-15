@@ -99,6 +99,18 @@ def _gh_is_authenticated() -> bool:
     return proc.returncode == 0
 
 
+def _gh_token_scopes() -> list[str]:
+    """Return the list of scopes granted to the current gh token."""
+    proc = _run(["gh", "auth", "status"])
+    if proc.returncode != 0:
+        return []
+    for line in (proc.stdout + proc.stderr).splitlines():
+        if "Token scopes:" in line:
+            raw = line.split("Token scopes:", 1)[1]
+            return [s.strip().strip("'\"") for s in raw.split(",") if s.strip()]
+    return []
+
+
 def _has_gh_token() -> bool:
     if os.environ.get("GITHUB_TOKEN"):
         return True
@@ -436,6 +448,25 @@ def handle_doctor(args: argparse.Namespace) -> int:
                 fix="" if gh_auth else "Run `gh auth login` and grant project scope.",
             )
         )
+        if gh_auth:
+            scopes = _gh_token_scopes()
+            has_project_scope = "project" in scopes
+            results.append(
+                CheckResult(
+                    name="gh-scope-project",
+                    status="PASS" if has_project_scope else "FAIL",
+                    detail=(
+                        "gh token has the 'project' scope."
+                        if has_project_scope
+                        else f"gh token is missing the 'project' scope (current scopes: {', '.join(scopes) or 'none'})."
+                    ),
+                    fix=(
+                        ""
+                        if has_project_scope
+                        else "Run: gh auth refresh --scopes project"
+                    ),
+                )
+            )
     else:
         results.append(
             CheckResult(
@@ -550,25 +581,56 @@ def handle_init(args: argparse.Namespace) -> int:
             create = project_number <= 0
 
         if create:
-            project = _create_project(owner, project_title)
+            try:
+                project = _create_project(owner, project_title)
+            except RuntimeError as exc:
+                msg = str(exc)
+                if "permission" in msg.lower() or "createProjectV2" in msg:
+                    raise RuntimeError(
+                        "GitHub token is missing the 'project' scope required to create projects.\n"
+                        "  Fix: gh auth refresh --scopes project\n"
+                        "  Then re-run: solo-os init"
+                    ) from None
+                raise
             project_number = int(project["number"])
             project_title = str(project.get("title") or project_title)
             created_project = True
 
     # Confirm project exists before writing config.
-    view_payload = run_gh_json(
-        [
-            "project",
-            "view",
-            str(project_number),
-            "--owner",
-            owner,
-            "--format",
-            "json",
-        ]
-    )
+    try:
+        view_payload = run_gh_json(
+            [
+                "project",
+                "view",
+                str(project_number),
+                "--owner",
+                owner,
+                "--format",
+                "json",
+            ]
+        )
+    except RuntimeError as exc:
+        msg = str(exc)
+        if "permission" in msg.lower() or "project" in msg.lower():
+            raise RuntimeError(
+                f"Cannot access GitHub Project #{project_number} for '{owner}'.\n"
+                "  If the project exists, make sure your token has the 'project' scope:\n"
+                "  Fix: gh auth refresh --scopes project\n"
+                "  Then re-run: solo-os init"
+            ) from None
+        raise
     project_title = str(view_payload.get("title") or project_title)
-    created_fields = _ensure_project_fields(owner, project_number)
+    try:
+        created_fields = _ensure_project_fields(owner, project_number)
+    except RuntimeError as exc:
+        msg = str(exc)
+        if "permission" in msg.lower():
+            raise RuntimeError(
+                "GitHub token is missing the 'project' scope required to manage project fields.\n"
+                "  Fix: gh auth refresh --scopes project\n"
+                "  Then re-run: solo-os init"
+            ) from None
+        raise
 
     mode = str(args.mode or "").strip().lower()
     if mode not in {"single", "multi"}:

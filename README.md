@@ -10,10 +10,39 @@ Other project-tracking backends (Linear, Jira, Notion, etc.) are **not currently
 
 ## Prerequisites
 
-- [GitHub CLI (`gh`)](https://cli.github.com/) installed and authenticated (`gh auth login`)
-- [git](https://git-scm.com/) installed
-- [Python 3.10+](https://www.python.org/)
-- [pipx](https://pipx.pypa.io/) recommended for install (or use `pip`)
+Install the required tools before running solo-os.
+
+**macOS (Homebrew)**
+
+```bash
+brew install gh git python pipx
+gh auth login
+gh auth refresh --scopes project   # required for GitHub Projects access
+```
+
+**Linux (apt)**
+
+```bash
+sudo apt install git python3 python3-pip pipx
+pipx ensurepath
+# Install gh: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+gh auth login
+gh auth refresh --scopes project   # required for GitHub Projects access
+```
+
+**Windows**
+
+```bash
+winget install GitHub.cli Git.Git Python.Python.3 pipx
+gh auth login
+gh auth refresh --scopes project   # required for GitHub Projects access
+```
+
+After setup, confirm your token has the right scopes:
+
+```bash
+gh auth status   # should show 'project' in Token scopes
+```
 
 ## Key Concept: Workspace vs Repo
 
@@ -58,7 +87,7 @@ Solo OS uses a single `solo-os.yml` file for all configuration. This file is **l
 
 ### Config discovery (3-tier resolution)
 
-1. **`SOLO_OS_ROOT` env var** — explicit override, highest priority
+1. `**SOLO_OS_ROOT` env var** — explicit override, highest priority
 2. **Walk up from cwd** — looks for `solo-os.yml` in parent directories (so commands work from any subdirectory)
 3. **XDG config home** — `~/.config/solo-os/config.yml` as global fallback
 
