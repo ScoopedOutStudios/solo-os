@@ -10,9 +10,10 @@ Other project-tracking backends (Linear, Jira, Notion, etc.) are **not currently
 
 ## Prerequisites
 
-- `gh` installed and authenticated (`gh auth login`)
-- `git` installed
-- Python available (3.10+)
+- [GitHub CLI (`gh`)](https://cli.github.com/) installed and authenticated (`gh auth login`)
+- [git](https://git-scm.com/) installed
+- [Python 3.10+](https://www.python.org/)
+- [pipx](https://pipx.pypa.io/) recommended for install (or use `pip`)
 
 ## Key Concept: Workspace vs Repo
 
@@ -32,21 +33,20 @@ You run `solo-os init` **once** from the workspace root. It creates the config, 
 ## Quick Start
 
 ```bash
-# 1. Install solo-os
-pip install -e .          # or: pip install solo-os
+# Install (no clone required)
+pipx install git+https://github.com/ScoopedOutStudios/solo-os.git
 
-# 2. Navigate to your workspace root
-#    Single-repo:  cd into the cloned repo
-#    Multi-repo:   cd into the parent directory above your repos
-cd ~/my-workspace
-
-# 3. Run guided setup (creates solo-os.yml + GitHub Project fields)
+# Set up — run from your workspace root
+cd ~/my-workspace        # parent dir of your repo(s)
 solo-os init
 
-# 4. Verify everything is configured correctly
+# Confirm everything works
 solo-os verify
+```
 
-# 5. Start using solo-os (works from anywhere inside the workspace)
+That's it — three commands to a working setup. Now use solo-os from anywhere inside your workspace:
+
+```bash
 solo-os daily-triage
 solo-os gh-list
 solo-os gh-brief --question active-work
@@ -58,7 +58,7 @@ Solo OS uses a single `solo-os.yml` file for all configuration. This file is **l
 
 ### Config discovery (3-tier resolution)
 
-1. `**SOLO_OS_ROOT` env var** — explicit override, highest priority
+1. **`SOLO_OS_ROOT` env var** — explicit override, highest priority
 2. **Walk up from cwd** — looks for `solo-os.yml` in parent directories (so commands work from any subdirectory)
 3. **XDG config home** — `~/.config/solo-os/config.yml` as global fallback
 
@@ -98,15 +98,6 @@ All repos share the same GitHub Project and field configuration.
 | `solo-os build-loop-template`     | Print an issue body template                                            |
 
 
-## Requirements
-
-- Python >= 3.10
-- [GitHub CLI (`gh`)](https://cli.github.com/) authenticated
-- git
-- PyYAML (installed automatically via pip)
-
-`solo-os init` now performs prerequisite checks at startup and exits with actionable fixes if `gh`/`git` are missing or `gh` auth is not configured.
-
 ## Init Examples
 
 ```bash
@@ -134,3 +125,15 @@ Issue body templates for all three workflow kinds:
 - `templates/build-loop-body-template.md`
 
 Print any template: `solo-os build-loop-template --kind idea`
+
+## Development
+
+To contribute or modify solo-os itself, clone the repo and install in editable mode:
+
+```bash
+git clone https://github.com/ScoopedOutStudios/solo-os.git
+cd solo-os
+pipx install -e .        # or: pip install -e .
+```
+
+Changes to the source are immediately reflected in the `solo-os` command.
