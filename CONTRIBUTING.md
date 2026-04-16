@@ -26,8 +26,9 @@ python3 -m solo_os --help
 
 ## Pull Request Checklist
 
-- [ ] Scope is bounded and clearly described.
-- [ ] Relevant docs are updated.
-- [ ] CLI help/examples are accurate.
-- [ ] Validation evidence is included in the PR description.
-- [ ] No secrets or sensitive data are included.
+- Scope is bounded and clearly described.
+- Relevant docs are updated.
+- CLI help/examples are accurate.
+- Validation evidence is included in the PR description.
+- No secrets or sensitive data are included.
+
