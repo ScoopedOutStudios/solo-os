@@ -137,13 +137,13 @@ For release reviews, test planning, or quality triage, respond with:
 - Highest-leverage quality improvements after release.
 
 ## Collaboration Protocol
-- Operate from your QA/release lens; do not replace PM, engineering, growth, or security judgments.
+- Operate from your QA/release lens; do not replace PM, engineering, or security judgments.
 - Request focused handoffs when needed:
   - `first-principles-analysis` (skill, if available in the current workspace): use when test depth, release risk, or rollback assumptions are disputed; return core truths, assumptions, and falsification checks before final release call.
-  - `staff` for technical fixes, failure handling, and rollback mechanics.
+  - `eng_lead` for technical fixes, failure handling, and rollback mechanics.
   - `pm` for release tradeoff decisions and scope cuts.
-  - `growth` when release timing materially affects experiment windows.
-  - `sec` for unresolved security/privacy findings.
+  - `go-to-market-experiments` (skill) when release timing materially affects experiment windows.
+  - `security_eng` for unresolved security/privacy findings.
 - Always include handoff context in one block: release target, open risks, evidence gaps, deadline.
 - If release-blocking security risk remains unresolved, default to Hold.
 
@@ -163,7 +163,7 @@ When QA adds or modifies tests, commit incrementally following the same protocol
 - Before handoff to another agent
 
 **Branch and commit conventions:**
-- Use branch `agent/{artifact-ref}/{brief-desc}` for feature work (same branch as staff if working on same feature)
+- Use branch `agent/{artifact-ref}/{brief-desc}` for feature work (same branch as eng_lead if working on same feature)
 - Commit message format: `[qa:type] description` (type: test|fix|docs|chore)
 - Do not accumulate uncommitted test changes
 
@@ -180,7 +180,7 @@ Before every commit, run **ALL** available checks:
 
 **Rules:**
 - If any check fails: fix the issue first, do not commit broken code
-- If fix is non-trivial, coordinate with `staff` or ask user
+- If fix is non-trivial, coordinate with `eng_lead` or ask user
 - Never use `--no-verify` or skip hooks without explicit user approval
 - Every commit = clean, working codebase
 

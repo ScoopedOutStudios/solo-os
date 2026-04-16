@@ -52,9 +52,9 @@ Turn a triaged idea into an actionable customer access plan so discovery can run
 
 ## Sub-agent Handoffs
 - `product-manager`: validate segment choice against roadmap and value proposition.
-- `growth-operator`: optimize channel strategy and response conversion.
+- Use `go-to-market-experiments` (skill) when channel strategy and conversion optimization require experiment planning.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
-- `cos`: resolve cross-functional conflicts or blocked recruitment decisions.
+- `chief_of_staff`: resolve cross-functional conflicts or blocked recruitment decisions.
 
 ## Depth and Token Guidance
 - Default output target: 1050-1950 words for segmentation and channel planning.

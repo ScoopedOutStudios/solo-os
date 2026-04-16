@@ -52,7 +52,7 @@ Decide quickly whether an idea should move to discovery now, be parked, or be ki
 ## Sub-agent Handoffs
 - `product-manager`: confirm roadmap fit and priority.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
-- `cos`: only if cross-functional conflicts need arbitration.
+- `chief_of_staff`: only if cross-functional conflicts need arbitration.
 
 ## Depth and Token Guidance
 - Default output target: 1050-1800 words when decisions are non-trivial.

@@ -51,10 +51,10 @@ Create a fast, disposable proof-of-concept to validate core solution assumptions
 
 ## Sub-agent Handoffs
 - `product-manager`: verify customer value and roadmap relevance of findings.
-- `staff-engineer`: advise on minimal scope and feasibility constraints.
-- `security-privacy-engineer`: ensure probe avoids risky data collection/exposure.
+- `eng_lead`: advise on minimal scope and feasibility constraints.
+- `security_eng`: ensure probe avoids risky data collection/exposure.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
-- `cos`: arbitrate if specialist recommendations conflict.
+- `chief_of_staff`: arbitrate if specialist recommendations conflict.
 
 ## Depth and Token Guidance
 - Default output target: 1050-1950 words for probe design and readout.

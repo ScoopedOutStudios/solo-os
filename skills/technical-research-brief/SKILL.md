@@ -67,9 +67,9 @@ Adapt source selection based on the specific technology domain.
 - Every technical claim must have source attribution.
 
 ## Sub-agent Handoffs
-- `research-guru`: primary agent that drives this skill.
-- `staff-engineer`: receives technical findings for architecture and build decisions.
-- `security-privacy-engineer`: receives security-relevant findings (CVEs, vulnerability history).
+- `research_guru`: primary agent that drives this skill.
+- `eng_lead`: receives technical findings for architecture and build decisions.
+- `security_eng`: receives security-relevant findings (CVEs, vulnerability history).
 - `solution-probe-poc` (skill): receives technical options to inform POC technology choices.
 - `build-loop-and-release-rhythm` (skill): receives technical context for implementation planning.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
@@ -83,6 +83,6 @@ Adapt source selection based on the specific technology domain.
 ## Guardrails
 - Every technical claim must be labeled `[Verified]`, `[Directional]`, or `[Inference]` with source.
 - Do not fabricate benchmark numbers, download counts, or version histories.
-- Do not make final architecture decisions — present findings and hand off to `staff-engineer`.
+- Do not make final architecture decisions — present findings and hand off to `eng_lead`.
 - If the technical question is too broad ("what framework should I use?"), ask for constraints before researching.
 - Flag when documentation is poor, community is inactive, or security history is concerning.

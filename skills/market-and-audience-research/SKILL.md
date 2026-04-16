@@ -14,7 +14,7 @@ Find and structure quantitative market evidence — market size, audience demogr
 - When customer-segment-and-access-map skill needs demographic and behavioral data.
 - During MVP scoping to validate market size assumptions.
 - When opportunity-scanner needs quantitative evidence for opportunity ranking.
-- Optionally when growth-operator needs channel benchmarks and audience data (invoke growth-operator explicitly).
+- Optionally when go-to-market experiments need channel benchmarks and audience data.
 - When any agent asks "how big is this market?" or "who is the audience?"
 
 ## Execution Context (Resource Reality)
@@ -83,12 +83,12 @@ Adapt source selection based on the specific market and geography.
 - Every data point must have source attribution with publication date.
 
 ## Sub-agent Handoffs
-- `research-guru`: primary agent that drives this skill.
+- `research_guru`: primary agent that drives this skill.
 - `product-manager`: receives market context for roadmap and scoping decisions.
 - `pricing-and-unit-economics` (skill): receives pricing benchmarks and willingness-to-pay data.
 - `customer-segment-and-access-map` (skill): receives audience demographics and behavior data.
 - `opportunity-scanner` (skill): receives market size and trend data for opportunity ranking.
-- Optionally `growth-operator`: when channel/audience data is for experiment design and user requests growth review.
+- Optionally use `go-to-market-experiments` (skill) when channel/audience data is for experiment design.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance

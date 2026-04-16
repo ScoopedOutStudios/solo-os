@@ -48,8 +48,8 @@ Validate whether the target customer has a real, urgent problem worth solving no
 
 ## Sub-agent Handoffs
 - `product-manager`: validate customer-value framing and roadmap relevance.
-- `growth-operator`: shape testable demand/activation hypotheses.
-- `pricing-and-unit-economics` skill or `growth-operator`: if willingness-to-pay signal is central.
+- Use `go-to-market-experiments` (skill) to shape testable demand/activation hypotheses when needed.
+- `pricing-and-unit-economics` skill or `go-to-market-experiments` (skill): if willingness-to-pay signal is central.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
 ## Depth and Token Guidance

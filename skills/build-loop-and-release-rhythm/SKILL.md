@@ -25,7 +25,7 @@ Invoke this skill when:
 - Declaring a build loop complete (run Checkpoint C).
 - Preparing a release for external users (run Checkpoint B, if non-trivial).
 
-The **cos** (Chief of Staff) agent is the default driver. Project rules should reference this skill in a "Build Loop Discipline" section so agents know to invoke it at loop boundaries.
+The **chief_of_staff** agent is the default driver. Project rules should reference this skill in a "Build Loop Discipline" section so agents know to invoke it at loop boundaries.
 
 ## Use When
 - You are ready to implement scoped work.
@@ -146,19 +146,18 @@ Use only these three by default. Add more only for high-risk work.
 - Track active workflow state in GitHub Projects/Issues, not in markdown artifacts.
 
 ## Sub-agent Handoffs
-- `cos`: orchestrate cross-functional sequence and conflict resolution.
-- `staff`: implementation feasibility, architecture, and slicing.
+- `chief_of_staff`: orchestrate cross-functional sequence and conflict resolution.
+- `eng_lead`: implementation feasibility, architecture, and slicing.
 - `qa`: release readiness and rollback safety.
-- `sec`: trust/privacy checks for sensitive surfaces.
+- `security_eng`: trust/privacy checks for sensitive surfaces.
 - `pm`: scope discipline and outcome alignment.
-- Optionally invoke `growth` for post-release metrics when the product has meaningful funnel data and the founder wants a growth readout.
 - cos runs the artifact governance checklist (metadata, placement, version) before final approval.
 
 ### Routing by risk
 
-- `Low` internal-only loops: `pm` / `staff` is usually enough.
+- `Low` internal-only loops: `pm` / `eng_lead` is usually enough.
 - `Medium` external-facing loops: add `qa`.
-- `High` / `Critical` loops: add `qa`; add `sec` for auth, payments, privacy, production data integrity, or trust-sensitive changes.
+- `High` / `Critical` loops: add `qa`; add `security_eng` for auth, payments, privacy, production data integrity, or trust-sensitive changes.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for build-loop planning and checkpoint decisions.
@@ -181,7 +180,7 @@ For pre-revenue projects with <100 users, use a lighter checkpoint profile:
   - **Exception — external-facing loops:** If the loop ships to non-founder users (ICP outreach, public demos, beta invites), invoke `qa` for a scoped release readiness check: core flow validation, smoke test pass, share/embed/landing checks, known-issues list.
 - **Checkpoint C:** Required. Learning note + next-plan update decision.
   - Include a "release quality retrospective" line: what broke, what was missed, feed into next loop.
-- Skip sub-agent handoffs to `sec` unless the loop touches auth, PII, or payment.
+- Skip sub-agent handoffs to `security_eng` unless the loop touches auth, PII, or payment.
 - Skip sub-agent handoffs to `qa` only for honest `Low` internal-only loops. Invoke for any **external-facing** release (see Checkpoint B exception above).
 
 Graduate to the full checkpoint profile when the product has paying users or public exposure (e.g., Product Hunt launch).
@@ -197,7 +196,7 @@ Maintain a queue of 2-3 execution-ready plans ahead of the active loop:
 
 ### Review Pre-Step Template
 
-Include this section at the top of every queued plan (after metadata, before the task list). The cos (Chief of Staff) runs it when transitioning to the next loop:
+Include this section at the top of every queued plan (after metadata, before the task list). The chief_of_staff runs it when transitioning to the next loop:
 
 ```markdown
 ## Review Pre-Step (run before Checkpoint A)

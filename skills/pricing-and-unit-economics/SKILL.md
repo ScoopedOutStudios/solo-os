@@ -49,10 +49,10 @@ Ensure product decisions remain economically viable at solopreneur scale.
 
 ## Sub-agent Handoffs
 - `product-manager`: validate customer value vs pricing tradeoffs.
-- `growth-operator`: align acquisition/activation assumptions with economics model.
-- `staff-engineer`: assess cost-to-serve implications of technical scope.
+- Use `go-to-market-experiments` (skill) to align acquisition/activation assumptions with economics model when needed.
+- `eng_lead`: assess cost-to-serve implications of technical scope.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
-- `cos`: resolve cross-functional tradeoff conflicts.
+- `chief_of_staff`: resolve cross-functional tradeoff conflicts.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for pricing and viability recommendations.
