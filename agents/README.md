@@ -12,9 +12,18 @@ When installed, these agents are available as sub-agents that can be invoked by 
 solo-os install-agents
 ```
 
+Install for another IDE profile:
+
+```bash
+solo-os install-agents --ide claude-code
+```
+
+`install-agents` does not target Codex yet. Codex custom agents are TOML files in
+`.codex/agents/` or `~/.codex/agents/`, which differ from Solo OS markdown agent specs.
+
 **Manual:**
 
-Copy all `.md` files from this directory to `~/.cursor/agents/`.
+Copy all `.md` files from this directory to your IDE's agent directory.
 
 ## Agents
 

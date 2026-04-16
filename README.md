@@ -125,6 +125,9 @@ All repos share the same GitHub Project and field configuration.
 | `solo-os sync-audit`              | Run local sync audit checks                                             |
 | `solo-os cleanup-markdown`        | Archive redundant markdown artifacts                                    |
 | `solo-os build-loop-template`     | Print an issue body template                                            |
+| `solo-os install-agents`          | Install agent specs (`--ide cursor|claude-code`)                       |
+| `solo-os install-skills`          | Install skill specs (`--ide cursor|claude-code|codex`)                 |
+| `solo-os install-commands`        | Install command specs (`--ide cursor|claude-code`)                     |
 
 
 ## Init Examples

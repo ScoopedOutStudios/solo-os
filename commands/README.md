@@ -10,7 +10,16 @@ Automatic (recommended):
 solo-os install-commands
 ```
 
-Manual: copy the `.md` files from this directory into `.cursor/commands/solo-os/` in your target repo.
+For other IDE profiles:
+
+```bash
+solo-os install-commands --ide claude-code
+```
+
+Codex support is intentionally omitted here. Codex best practices center around
+`AGENTS.md` plus skills rather than markdown command packs.
+
+Manual: copy the `.md` files from this directory into your IDE command directory in the target repo.
 
 ## Commands
 

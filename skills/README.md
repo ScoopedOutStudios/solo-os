@@ -10,7 +10,16 @@ Install all skills to your Cursor IDE:
 solo-os install-skills
 ```
 
-Or manually copy individual skill folders to `~/.cursor/skills/`.
+Install for another IDE profile:
+
+```bash
+solo-os install-skills --ide claude-code
+solo-os install-skills --ide codex
+```
+
+For Codex, skills install to `~/.agents/skills/` by default (Codex best-practice path).
+
+Or manually copy individual skill folders to your IDE skill directory.
 
 ## Skills
 

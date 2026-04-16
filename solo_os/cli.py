@@ -136,18 +136,24 @@ def _build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("weekly-cycle", help="Run weekly maintenance: sync-audit then cleanup-markdown")
 
     # --- install-agents ---
-    inst_agents = subparsers.add_parser("install-agents", help="Install agent specs to Cursor agents directory")
-    inst_agents.add_argument("--target", help="Target directory (default: ~/.cursor/agents)")
+    inst_agents = subparsers.add_parser("install-agents", help="Install agent specs for supported IDEs")
+    inst_agents.add_argument("--ide", choices=["cursor", "claude-code"], default="cursor",
+                             help="IDE target profile (default: cursor)")
+    inst_agents.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_agents.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- install-skills ---
-    inst_skills = subparsers.add_parser("install-skills", help="Install skill specs to Cursor skills directory")
-    inst_skills.add_argument("--target", help="Target directory (default: ~/.cursor/skills)")
+    inst_skills = subparsers.add_parser("install-skills", help="Install skill specs for supported IDEs")
+    inst_skills.add_argument("--ide", choices=["cursor", "claude-code", "codex"], default="cursor",
+                             help="IDE target profile (default: cursor)")
+    inst_skills.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_skills.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- install-commands ---
-    inst_cmds = subparsers.add_parser("install-commands", help="Install commands to project .cursor/commands/solo-os")
-    inst_cmds.add_argument("--target", help="Target directory (default: .cursor/commands/solo-os)")
+    inst_cmds = subparsers.add_parser("install-commands", help="Install command specs for supported IDEs")
+    inst_cmds.add_argument("--ide", choices=["cursor", "claude-code"], default="cursor",
+                           help="IDE target profile (default: cursor)")
+    inst_cmds.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_cmds.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- build-loop-template ---

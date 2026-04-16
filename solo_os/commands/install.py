@@ -4,6 +4,62 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import Literal
+
+IdeName = Literal["cursor", "claude-code", "codex"]
+AgentsIdeName = Literal["cursor", "claude-code"]
+CommandsIdeName = Literal["cursor", "claude-code"]
+
+AGENTS_TARGETS: dict[AgentsIdeName, Path] = {
+    "cursor": Path.home() / ".cursor" / "agents",
+    "claude-code": Path.home() / ".claude" / "agents",
+}
+
+SKILLS_TARGETS: dict[IdeName, Path] = {
+    "cursor": Path.home() / ".cursor" / "skills",
+    "claude-code": Path.home() / ".claude" / "skills",
+    # Codex docs recommend Agent Skills in ~/.agents/skills, not ~/.codex/skills.
+    "codex": Path.home() / ".agents" / "skills",
+}
+
+COMMANDS_TARGETS: dict[CommandsIdeName, Path] = {
+    "cursor": Path(".cursor") / "commands" / "solo-os",
+    # Claude keeps legacy commands support, though skills are preferred long-term.
+    "claude-code": Path(".claude") / "commands" / "solo-os",
+}
+
+
+def _resolve_ide(args: object) -> IdeName:
+    ide = getattr(args, "ide", "cursor") or "cursor"
+    if ide not in SKILLS_TARGETS:
+        raise RuntimeError(
+            f"Unsupported IDE '{ide}'. Expected one of: {', '.join(SKILLS_TARGETS)}"
+        )
+    return ide  # type: ignore[return-value]
+
+
+def _resolve_target(args: object, kind: str) -> tuple[str, Path]:
+    ide = _resolve_ide(args)
+    target = getattr(args, "target", None)
+    if kind == "agents" and ide not in AGENTS_TARGETS:
+        raise RuntimeError(
+            "IDE profile 'codex' is not supported for install-agents. "
+            "Codex custom agents use TOML files in .codex/agents or ~/.codex/agents."
+        )
+    if kind == "commands" and ide not in COMMANDS_TARGETS:
+        raise RuntimeError(
+            "IDE profile 'codex' is not supported for install-commands. "
+            "Codex best practices recommend AGENTS.md + skills instead of markdown command packs."
+        )
+    if target:
+        return ide, Path(target)
+    if kind == "agents":
+        return ide, AGENTS_TARGETS[ide]  # type: ignore[index]
+    if kind == "skills":
+        return ide, SKILLS_TARGETS[ide]
+    if kind == "commands":
+        return ide, COMMANDS_TARGETS[ide]  # type: ignore[index]
+    raise RuntimeError(f"Unsupported install kind: {kind}")
 
 
 def _pkg_root() -> Path:
@@ -61,7 +117,7 @@ def _copy_files(
 
 
 def handle_install_agents(args: object) -> int:
-    target = Path(getattr(args, "target", None) or Path.home() / ".cursor" / "agents")
+    ide, target = _resolve_target(args, "agents")
     force = getattr(args, "force", False)
     src = _pkg_root() / "agents"
 
@@ -69,14 +125,14 @@ def handle_install_agents(args: object) -> int:
         print(f"Error: agents directory not found at {src}")
         return 1
 
-    print(f"Installing agents to {target} ...")
+    print(f"Installing agents for IDE '{ide}' to {target} ...")
     installed = _copy_files(src, target, force=force, glob_pattern="*.md")
     print(f"  {len(installed)} file(s) installed.")
     return 0
 
 
 def handle_install_skills(args: object) -> int:
-    target = Path(getattr(args, "target", None) or Path.home() / ".cursor" / "skills")
+    ide, target = _resolve_target(args, "skills")
     force = getattr(args, "force", False)
     src = _pkg_root() / "skills"
 
@@ -84,7 +140,7 @@ def handle_install_skills(args: object) -> int:
         print(f"Error: skills directory not found at {src}")
         return 1
 
-    print(f"Installing skills to {target} ...")
+    print(f"Installing skills for IDE '{ide}' to {target} ...")
     installed = _copy_files(
         src, target, force=force, glob_pattern="*.md", recursive=True
     )
@@ -93,10 +149,7 @@ def handle_install_skills(args: object) -> int:
 
 
 def handle_install_commands(args: object) -> int:
-    target = Path(
-        getattr(args, "target", None)
-        or Path(".cursor") / "commands" / "solo-os"
-    )
+    ide, target = _resolve_target(args, "commands")
     force = getattr(args, "force", False)
     src = _pkg_root() / "commands"
 
@@ -104,7 +157,7 @@ def handle_install_commands(args: object) -> int:
         print(f"Error: commands directory not found at {src}")
         return 1
 
-    print(f"Installing commands to {target} ...")
+    print(f"Installing commands for IDE '{ide}' to {target} ...")
     installed = _copy_files(src, target, force=force, glob_pattern="*.md")
     print(f"  {len(installed)} file(s) installed.")
     return 0
