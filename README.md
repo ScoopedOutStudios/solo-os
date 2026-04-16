@@ -191,7 +191,11 @@ solo-os init --owner @me
 
 ## Contributing
 
-Contributions are welcome. For now, open an issue describing the problem, proposed behavior, and how it fits the Solo OS workflow model.
+Contributions are welcome.
+
+- Start with `CONTRIBUTING.md` for contribution workflow and quality expectations.
+- See `SECURITY.md` for responsible vulnerability disclosure.
+- Open an issue describing the problem, proposed behavior, and how it fits the Solo OS workflow model.
 
 ## Development
 
