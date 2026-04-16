@@ -1,23 +1,63 @@
 # Solo OS
 
-CLI toolkit for solo/small-team project governance on GitHub Projects V2.
+Solo OS is a GitHub Projects V2 operating layer for solo builders and small teams who want clear execution loops instead of planning chaos.
 
-## Tracking Backend: GitHub Projects V2
+It combines a CLI, issue templates, and AI agent/skill packs so one workspace can move cleanly from idea -> roadmap -> build loop -> release learning.
 
-Solo OS uses **GitHub Projects V2** as its single source of truth for tracking ideas, roadmap items, build loops, and day-to-day tasks. All issue triage, status updates, and planning queries go through a GitHub Project board with structured fields (Kind, Status, Stage).
+## Why Solo OS
 
-Other project-tracking backends (Linear, Jira, Notion, etc.) are **not currently supported**. The architecture is open to adding alternative backends in the future — contributions are welcome.
+- Keep active planning state in GitHub Projects and issues, not scattered notes.
+- Run a repeatable build loop rhythm with explicit scope, validation, and rollback thinking.
+- Get useful daily triage and next-action answers from your live project state.
+- Adopt in layers, from lightweight CLI usage to deeper AI-assisted workflows.
 
-## Prerequisites
+## System Overview
 
-Install the required tools before running solo-os.
+```mermaid
+flowchart LR
+    A[Workspace with one or more repos] --> B[solo-os.yml]
+    B --> C[solo-os CLI]
+    C --> D[GitHub Project V2]
+    D --> E[Issues with Kind Status Stage]
+    C --> F[Issue templates and governance docs]
+    C --> G[Agent skill command packs]
+    E --> H[Daily triage roadmap build loops]
+```
+
+
+
+## Tiered Adoption
+
+### Tier 1: Daily clarity in minutes
+
+- Run `solo-os init`, then `solo-os daily-triage` and `solo-os gh-next`.
+- Use it as your planning cockpit without changing your code workflow.
+
+### Tier 2: Build loop discipline
+
+- Use canonical Build Loop templates and `solo-os bl-review`.
+- Keep each loop bounded with explicit non-goals and release checks.
+
+### Tier 3: AI workflow assistance
+
+- Install agent, skill, and command packs for supported IDEs.
+- Standardize prompt quality and decision framing across loops.
+
+### Tier 4: Full operating system
+
+- Run weekly maintenance and audit routines (`weekly-cycle`, `sync-audit`).
+- Treat Solo OS as the execution substrate across multiple repos.
+
+## Quick Start
+
+### 1) Install prerequisites
 
 **macOS (Homebrew)**
 
 ```bash
 brew install gh git python pipx
 gh auth login
-gh auth refresh --scopes project   # required for GitHub Projects access
+gh auth refresh --scopes project
 ```
 
 **Linux (apt)**
@@ -27,7 +67,7 @@ sudo apt install git python3 python3-pip pipx
 pipx ensurepath
 # Install gh: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 gh auth login
-gh auth refresh --scopes project   # required for GitHub Projects access
+gh auth refresh --scopes project
 ```
 
 **Windows**
@@ -35,45 +75,30 @@ gh auth refresh --scopes project   # required for GitHub Projects access
 ```bash
 winget install GitHub.cli Git.Git Python.Python.3 pipx
 gh auth login
-gh auth refresh --scopes project   # required for GitHub Projects access
+gh auth refresh --scopes project
 ```
 
-After setup, confirm your token has the right scopes:
+Validate auth scope:
 
 ```bash
-gh auth status   # should show 'project' in Token scopes
+gh auth status
 ```
 
-## Key Concept: Workspace vs Repo
-
-Solo OS is a **workspace-level** tool, not a per-repo tool. It manages one or more Git repos through a single `solo-os.yml` config file that sits at your **workspace root** — the parent directory that contains your repo(s).
-
-```
-# Single-repo workspace             # Multi-repo workspace
-my-project/                          my-workspace/
-  solo-os.yml  ← config here           solo-os.yml  ← config here
-  src/                                  app-backend/
-  ...                                   app-frontend/
-                                        marketing-site/
-```
-
-You run `solo-os init` **once** from the workspace root. It creates the config, sets up your GitHub Project, and registers your first repo. You do **not** run init separately for each repo.
-
-## Quick Start
+### 2) Install Solo OS
 
 ```bash
-# Install (no clone required)
 pipx install git+https://github.com/ScoopedOutStudios/solo-os.git
+```
 
-# Set up — run from your workspace root
-cd ~/my-workspace        # parent dir of your repo(s)
+### 3) Initialize from workspace root
+
+```bash
+cd ~/my-workspace
 solo-os init
-
-# Confirm everything works
 solo-os verify
 ```
 
-That's it — three commands to a working setup. Now use solo-os from anywhere inside your workspace:
+### 4) Run your first triage loop
 
 ```bash
 solo-os daily-triage
@@ -81,90 +106,99 @@ solo-os gh-list
 solo-os gh-brief --question active-work
 ```
 
-## Configuration
+If these commands run, your baseline setup is complete.
 
-Solo OS uses a single `solo-os.yml` file for all configuration. This file is **local-only** and should not be committed to any repo.
+## Architecture Walkthrough
 
-### Config discovery (3-tier resolution)
+### Workspace model
 
-1. `**SOLO_OS_ROOT` env var** — explicit override, highest priority
-2. **Walk up from cwd** — looks for `solo-os.yml` in parent directories (so commands work from any subdirectory)
-3. **XDG config home** — `~/.config/solo-os/config.yml` as global fallback
+Solo OS is workspace-level, not repo-level. One `solo-os.yml` file configures one or more repos:
 
-### Adding repos to an existing workspace
-
-You do **not** re-run `solo-os init` to add repos. Edit `solo-os.yml` directly:
-
-```yaml
-repos:
-  - id: app-backend        # existing repo
-    path: ./app-backend
-    active: true
-  - id: app-frontend       # add this block for the new repo
-    path: ./app-frontend
-    active: true
+```text
+# Single-repo workspace             # Multi-repo workspace
+my-project/                          my-workspace/
+  solo-os.yml                          solo-os.yml
+  src/                                 app-backend/
+  ...                                  app-frontend/
+                                       marketing-site/
 ```
 
-All repos share the same GitHub Project and field configuration.
+### Config discovery order
 
-## Commands
+1. `SOLO_OS_ROOT` environment override
+2. Walk-up discovery from current directory
+3. XDG fallback at `~/.config/solo-os/config.yml`
+
+### GitHub as source of truth
+
+Solo OS currently supports GitHub Projects V2 only. Issues are managed with structured fields such as `Kind`, `Status`, and `Stage`, and CLI commands operate against that state.
+
+## Command Surface
 
 
-| Command                           | Description                                                             |
-| --------------------------------- | ----------------------------------------------------------------------- |
-| `solo-os init`                    | Guided setup for `solo-os.yml` and GitHub Project fields                |
-| `solo-os verify`                  | Validate environment, config, and project setup                         |
-| `solo-os daily-triage`            | Review stages, flag WIP violations, suggest moves                       |
-| `solo-os gh-list`                 | List project-backed GitHub issues                                       |
-| `solo-os gh-next`                 | Show next actionable items                                              |
-| `solo-os gh-brief --question <q>` | Answer planning questions (active-work, roadmap-now, in-progress-ideas) |
-| `solo-os gh-update`               | Update issue content and/or project fields                              |
-| `solo-os gh-promote`              | Promote an issue to a different Kind                                    |
-| `solo-os gh-close`                | Close an issue and sync project status                                  |
-| `solo-os gh-migrate-titles`       | Rename legacy workflow issue prefixes                                   |
-| `solo-os sync-audit`              | Run local sync audit checks                                             |
-| `solo-os cleanup-markdown`        | Archive redundant markdown artifacts                                    |
-| `solo-os build-loop-template`     | Print an issue body template                                            |
-| `solo-os install-agents`          | Install agent specs (`--ide cursor|claude-code`)                       |
-| `solo-os install-skills`          | Install skill specs (`--ide cursor|claude-code|codex`)                 |
-| `solo-os install-commands`        | Install command specs (`--ide cursor|claude-code`)                     |
+| Command                           | Description                                                                   |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| `solo-os init`                    | Guided setup for `solo-os.yml` and GitHub Project fields                      |
+| `solo-os verify`                  | Validate environment, config, and project setup                               |
+| `solo-os daily-triage`            | Review stages, flag WIP violations, suggest moves                             |
+| `solo-os gh-list`                 | List project-backed GitHub issues                                             |
+| `solo-os gh-next`                 | Show next actionable items                                                    |
+| `solo-os gh-brief --question <q>` | Answer planning questions (`active-work`, `roadmap-now`, `in-progress-ideas`) |
+| `solo-os gh-update`               | Update issue content and/or project fields                                    |
+| `solo-os gh-promote`              | Promote an issue to a different Kind                                          |
+| `solo-os gh-close`                | Close an issue and sync project status                                        |
+| `solo-os gh-migrate-titles`       | Rename legacy workflow issue prefixes                                         |
+| `solo-os bl-review`               | Review Build Loop Checkpoint A readiness                                      |
+| `solo-os bl-status`               | Show open Build Loop issues across repos                                      |
+| `solo-os sync-audit`              | Run local sync audit checks                                                   |
+| `solo-os cleanup-markdown`        | Archive redundant markdown artifacts                                          |
+| `solo-os weekly-cycle`            | Run weekly maintenance (`sync-audit` + `cleanup-markdown`)                    |
+| `solo-os build-loop-template`     | Print canonical issue body templates                                          |
+| `solo-os install-agents`          | Install agent specs (`--ide cursor\|claude-code`)                            |
+| `solo-os install-skills`          | Install skill specs (`--ide cursor\|claude-code\|codex`)                     |
+| `solo-os install-commands`        | Install command packs (`--ide cursor\|claude-code`)                          |
 
+
+## Documentation Strategy
+
+The chosen structure for now is:
+
+- Keep one hero `README.md` as the first-stop onboarding and narrative.
+- Keep deeper references in `docs/` and the packaged templates/spec assets.
+- Split further only when user feedback shows the hero README is too dense.
+
+Current core references:
+
+- `docs/workflow-spec.md`
+- `docs/governance/build-loop-and-release-rhythm.md`
+- `solo_os/templates/` for issue body templates
 
 ## Init Examples
 
 ```bash
-# Interactive setup — run from your workspace root
-cd ~/my-workspace
+# Interactive
 solo-os init
 
-# Non-interactive with an existing GitHub Project
-solo-os init --yes --owner ScoopedOutStudios --project 7
+# Existing GitHub Project
+solo-os init --yes --owner my-org --project 7
 
-# Non-interactive — creates a new GitHub Project automatically
-solo-os init --yes --owner ScoopedOutStudios --project-title "Solo OS Planning"
+# Create a new GitHub Project
+solo-os init --yes --owner my-org --project-title "Solo OS Planning"
 
-# Use @me to auto-detect your GitHub username
+# Auto-detect your GitHub username
 solo-os init --owner @me
 ```
 
-## Templates
+## Contributing
 
-Issue body templates for all three workflow kinds:
-
-- `templates/idea-body-template.md`
-- `templates/roadmap-body-template.md`
-- `templates/build-loop-body-template.md`
-
-Print any template: `solo-os build-loop-template --kind idea`
+Contributions are welcome. For now, open an issue describing the problem, proposed behavior, and how it fits the Solo OS workflow model.
 
 ## Development
-
-To contribute or modify solo-os itself, clone the repo and install in editable mode:
 
 ```bash
 git clone https://github.com/ScoopedOutStudios/solo-os.git
 cd solo-os
-pipx install -e .        # or: pip install -e .
+pipx install -e .
+python3 -m solo_os --help
 ```
 
-Changes to the source are immediately reflected in the `solo-os` command.
