@@ -10,4 +10,4 @@ Please:
 3. If it should exist in GitHub, draft the issue title and a self-sufficient issue body.
 4. Recommend the initial Status.
 5. If it is still speculative, triage it as Go / Park / Kill with key assumptions called out.
-6. If approved, create or update the GitHub issue using Solo OS commands.
+6. If approved, create or update the GitHub issue using Solo OS (prefer `solo-os gh-create` for new issues, or `solo-os gh-update` to edit an existing one). Also add it to the Project and set `Kind/Status/Stage` so Solo OS commands can “see” it.

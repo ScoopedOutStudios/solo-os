@@ -668,6 +668,27 @@ def _print_view_guidance(project_url: str) -> None:
     print(f"\nOpen your project: {project_url}")
 
 
+def handle_onboarding() -> int:
+    """Print the bundled getting-started guide (markdown)."""
+    guide = Path(__file__).resolve().parent.parent / "templates" / "user-guide-getting-started.md"
+    if guide.is_file():
+        text = guide.read_text(encoding="utf-8")
+    else:
+        # This should be rare: the guide is part of the package, but this fallback
+        # prevents a completely broken `solo-os onboarding` in partial checkouts.
+        text = (
+            "Solo OS onboarding guide is missing from the package.\n"
+            f"Expected: {guide}\n\n"
+            "Fix:\n"
+            "- Reinstall solo-os, or use a full checkout of the `solo-os` repository.\n"
+            "- In development: ensure `solo_os/templates/user-guide-getting-started.md` exists.\n"
+        )
+    sys.stdout.write(text)
+    if not text.endswith("\n"):
+        sys.stdout.write("\n")
+    return 0
+
+
 def handle_doctor(args: argparse.Namespace) -> int:
     check_path = Path(getattr(args, "path", ".")).expanduser().resolve()
     results: list[CheckResult] = []
@@ -692,13 +713,13 @@ def handle_doctor(args: argparse.Namespace) -> int:
         )
     )
 
-    python_ok = (sys.version_info.major, sys.version_info.minor) >= (3, 9)
+    python_ok = (sys.version_info.major, sys.version_info.minor) >= (3, 10)
     results.append(
         CheckResult(
             name="python-version",
             status="PASS" if python_ok else "FAIL",
             detail=f"Python {sys.version_info.major}.{sys.version_info.minor} detected.",
-            fix="" if python_ok else "Use Python 3.9+.",
+            fix="" if python_ok else "Use Python 3.10+ (matches pyproject.toml).",
         )
     )
 
@@ -1100,6 +1121,8 @@ def handle_init(args: argparse.Namespace) -> int:
         _print_view_guidance(project_url)
         print("\nNext steps:")
         print("1) Run `solo-os verify` to confirm setup")
-        print("2) Run `solo-os gh-next` to pick the next item")
+        print("2) Run `solo-os onboarding` once (empty project + idea→roadmap→build loop + AI packs)")
+        print("3) Run `solo-os workflow-start` for a compact tour, or create your first issues with `solo-os gh-create` + `--from-template`")
+        print("4) Add/adjust issues on your GitHub Project with Kind/Status/Stage, then run `solo-os daily-triage` + `solo-os gh-next`")
 
     return 0

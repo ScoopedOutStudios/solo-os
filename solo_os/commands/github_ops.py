@@ -22,8 +22,11 @@ from solo_os.display import (
     wrap_block,
 )
 from solo_os.github_ops import (
+    add_issue_to_project,
     close_issue,
     comment_on_issue,
+    create_issue,
+    ensure_project_item,
     edit_issue,
     get_project_config,
     issue_view,
@@ -40,6 +43,24 @@ STATUS_ORDER = {
     "Blocked": 4,
     "Done": 5,
 }
+
+_TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
+
+
+def _body_template_path(kind: str) -> Path:
+    template_names = {
+        "idea": "idea-body-template.md",
+        "roadmap": "roadmap-body-template.md",
+        "build-loop": "build-loop-body-template.md",
+    }
+    key = str(kind or "").strip().lower()
+    filename = template_names.get(key)
+    if not filename:
+        expected = ", ".join(sorted(template_names))
+        raise RuntimeError(
+            f"Unknown template kind '{kind}'. Expected one of: {expected}"
+        )
+    return _TEMPLATE_DIR / filename
 
 
 def row_for_item(item: Any) -> dict[str, str]:
@@ -467,4 +488,75 @@ def handle_migrate_titles(args: argparse.Namespace) -> int:
         "issues": rows,
     }
     print(json.dumps(result, indent=2))
+    return 0
+
+
+def handle_create(args: argparse.Namespace) -> int:
+    cfg = get_project_config()
+    repo = resolve_repo(args.repo)
+
+    title = str(args.title or "").strip()
+    if not title:
+        raise RuntimeError("--title is required")
+
+    if args.body is not None:
+        body = str(args.body)
+    elif args.body_file is not None:
+        body = Path(args.body_file).read_text(encoding="utf-8")
+    elif args.from_template:
+        template_path = _body_template_path(str(args.from_template))
+        if not template_path.is_file():
+            raise RuntimeError(f"Template not found: {template_path}")
+        body = template_path.read_text(encoding="utf-8")
+    else:
+        body = ""
+
+    labels: list[str] = []
+    if args.label:
+        labels.extend([str(x).strip() for x in args.label if str(x).strip()])
+
+    planned: dict[str, Any] = {
+        "repo": repo,
+        "title": title,
+        "body_chars": len(body),
+        "labels": labels,
+        "kind": args.kind,
+        "status": args.status,
+        "stage": args.stage,
+        "add_to_project": bool(args.add_to_project),
+    }
+    if args.dry_run:
+        print(json.dumps(planned, indent=2))
+        return 0
+
+    created = create_issue(repo, title=title, body=body, labels=labels or None)
+    issue_number = int(created.get("number") or 0)
+    if issue_number <= 0:
+        raise RuntimeError(f"Could not parse created issue number from: {created}")
+
+    if args.add_to_project:
+        # Ensure the issue is represented as a project item, then set fields.
+        issue = issue_view(repo, issue_number)
+        owner = str((cfg or {}).get("owner") or "")
+        project_number = int((cfg or {}).get("number") or 0)
+        if not owner or project_number <= 0:
+            raise RuntimeError("Config is missing github.owner or github.project.number; cannot add issue to project.")
+        # Best-effort add; ensure_project_item retries until visible.
+        add_issue_to_project(owner, project_number, str(issue.get("url") or ""))
+        ensure_project_item(cfg, repo, issue_number)  # type: ignore[arg-type]
+        if args.kind or args.status or args.stage:
+            update_project_fields(cfg, repo, issue_number, kind=args.kind, status=args.status, stage=args.stage)
+
+    result: dict[str, Any] = {
+        **planned,
+        "issue_number": issue_number,
+        "url": str(created.get("url") or issue_view(repo, issue_number).get("url") or ""),
+        "applied": True,
+    }
+    if args.format == "json":
+        print(json.dumps(result, indent=2))
+    else:
+        print(
+            f"Created {repo}#{issue_number} — {str(created.get('url') or result['url'])}"
+        )
     return 0

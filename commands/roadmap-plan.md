@@ -10,4 +10,4 @@ Please:
 3. Define the outcome, why it matters now, and what success would look like.
 4. Recommend the right parent/child linkage.
 5. Recommend whether we should create one Build Loop now or wait.
-6. Create or update the GitHub issue using Solo OS commands.
+6. Create or update the GitHub issue using Solo OS (prefer `solo-os gh-create` for new issues, or `solo-os gh-update` to edit an existing one). Set `Kind/Status/Stage` on the Project item.

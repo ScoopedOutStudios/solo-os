@@ -46,6 +46,36 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_brief.add_argument("--view", choices=["compact", "pretty", "full"], default="pretty")
     gh_brief.add_argument("--color", choices=["auto", "always", "never"], default="auto")
 
+    # --- gh-create ---
+    gh_create = subparsers.add_parser("gh-create", help="Create a GitHub issue and (by default) add it to the Solo OS project with fields")
+    gh_create.add_argument("--repo", required=True, help="Repo alias or owner/name")
+    gh_create.add_argument("--title", required=True, help="Issue title (use [Idea]/[Roadmap]/[Build Loop] prefixes as you prefer)")
+    create_body = gh_create.add_mutually_exclusive_group()
+    create_body.add_argument("--body", help="Issue body (markdown)")
+    create_body.add_argument("--body-file", help="Issue body from a file path")
+    create_body.add_argument(
+        "--from-template",
+        choices=["idea", "roadmap", "build-loop"],
+        help="Load the bundled Solo OS body template (idea/roadmap/build-loop)",
+    )
+    gh_create.add_argument(
+        "--label",
+        action="append",
+        default=[],
+        help="GitHub label to apply (repeatable). Example: --label triage",
+    )
+    gh_create.add_argument("--kind", help="Set project Kind (single select)")
+    gh_create.add_argument("--status", help="Set project Status (single select)")
+    gh_create.add_argument("--stage", help="Set project Stage (single select)")
+    gh_create.add_argument(
+        "--add-to-project",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Add the new issue to the configured GitHub Project and set fields (default: true)",
+    )
+    gh_create.add_argument("--format", choices=["text", "json"], default="text")
+    gh_create.add_argument("--dry-run", action="store_true", help="Preview the mutation without creating the issue")
+
     # --- gh-update ---
     gh_update = subparsers.add_parser("gh-update", help="Update issue content and/or project fields")
     gh_update.add_argument("--repo", required=True, help="Repo alias or owner/name")
@@ -99,6 +129,15 @@ def _build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify", help="Validate environment, config, and project setup")
     verify.add_argument("--path", default=".", help="Directory to start config discovery from")
     verify.add_argument("--format", choices=["table", "json"], default="table")
+
+    # --- onboarding ---
+    subparsers.add_parser(
+        "onboarding",
+        help="Print the getting-started guide (empty project, workflow, and AI packs). Same text as the bundled user guide.",
+    )
+
+    # --- workflow-start ---
+    subparsers.add_parser("workflow-start", help="Print a guided tour for Idea -> Roadmap -> Build Loop (CLI + optional AI packs)")
 
     # --- init ---
     init_cmd = subparsers.add_parser("init", help="Guided setup for solo-os.yml and GitHub Project fields")
@@ -191,6 +230,9 @@ def main() -> int:
         if args.command == "gh-brief":
             from solo_os.commands.github_ops import handle_brief
             return handle_brief(args)
+        if args.command == "gh-create":
+            from solo_os.commands.github_ops import handle_create
+            return handle_create(args)
         if args.command == "gh-update":
             from solo_os.commands.github_ops import handle_update
             return handle_update(args)
@@ -212,6 +254,12 @@ def main() -> int:
         if args.command == "verify":
             from solo_os.commands.onboarding import handle_doctor
             return handle_doctor(args)
+        if args.command == "onboarding":
+            from solo_os.commands.onboarding import handle_onboarding
+            return handle_onboarding()
+        if args.command == "workflow-start":
+            from solo_os.commands.workflow import handle_workflow_start
+            return handle_workflow_start()
         if args.command == "init":
             from solo_os.commands.onboarding import handle_init
             return handle_init(args)

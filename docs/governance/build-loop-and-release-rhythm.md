@@ -24,6 +24,14 @@ Applies whenever a `Build Loop` is created or executed in repos managed by Solo 
 - `docs/governance/git-commit-protocol.md` defines commit discipline and per-commit validation rules.
 - This document defines what a `Build Loop` must contain and what must happen at Checkpoints A, B, and C.
 
+### 3.1) Open-source CLI reality check (this repository)
+
+The governance in this document describes the **full operating model** Solo OS is designed to support over time.
+
+The **Python CLI shipped in this repo** (see `solo-os --help`) is intentionally narrower: it is strong at **GitHub Project operations**, **daily triage**, and **Checkpoint A review** (`bl-review`), but it does **not** currently ship `bl-prepare`, `bl-sync`, or `bl-finish` helpers.
+
+If you need isolated worktree execution today, use normal `git worktree` workflows and your repo’s validation commands, and keep the Build Loop issue as the source of truth for scope, risk tier, and checkpoint notes.
+
 ## 4) Canonical Build Loop Shape
 
 Every `Build Loop` should contain or link to the following:
@@ -211,11 +219,11 @@ Recommended branch/path convention:
 
 Recommended Solo OS orchestration flow for isolated mode:
 
-1. `bl-review` for Checkpoint A readiness
-2. `bl-prepare` to create or reuse the canonical managed worktree
-3. execute inside the returned `worktree_path`
-4. `bl-sync` at the recommended cadence during execution
-5. `bl-finish` only after Checkpoint B conditions are satisfied
+1. `solo-os bl-review` for Checkpoint A readiness (or validate the issue body manually against the canonical template)
+2. Create or reuse a dedicated worktree using `git worktree` (or an organization-specific wrapper, if you have one)
+3. Execute inside the dedicated worktree path
+4. Sync/rebase at the recommended cadence during execution
+5. Finish/merge only after Checkpoint B conditions are satisfied (merge using your repo’s normal PR/merge flow)
 
 Merge-back protocol for isolated mode:
 

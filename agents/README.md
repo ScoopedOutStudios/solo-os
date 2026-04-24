@@ -1,5 +1,7 @@
 # Solo OS Agent Specs
 
+> **Context:** For the skill vs command vs sub-agent model and a suggested workflow path, read [Use the bundled AI assets](../README.md#use-the-bundled-ai-assets) or run `solo-os onboarding`.
+
 Agent specs are markdown files that provide role-specific AI guidance for Cursor's autonomous agent system. Each spec defines a specialized persona — its responsibilities, decision protocols, collaboration patterns, and guardrails — so that AI agents operate with consistent quality and clear boundaries.
 
 When installed, these agents are available as sub-agents that can be invoked by name (e.g., `@pm`, `@eng_lead`, `@chief_of_staff`) within Cursor conversations.
@@ -37,3 +39,4 @@ Copy all `.md` files from this directory to your IDE's agent directory.
 | `qa` | QA & Release Manager — defines risk-based test plans, release readiness checks, and rollback safeguards. |
 | `security_eng` | Security & Privacy Engineer — reviews architecture, code, and releases for data protection, access control, and trust risks. |
 | `eng_lead` | Engineering Lead — reviews architecture, implementation, and code for correctness, maintainability, security, and performance. |
+| `workflow_orchestrator` | Workflow Orchestrator — guides idea → Roadmap/Build Loop creation using GitHub as source of truth and Solo OS CLI-first primitives. |

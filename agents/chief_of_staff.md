@@ -19,7 +19,7 @@ Your mission:
 
 **Build Loop execution mode:** Default to `simple mode` for active Build Loops: stay in the current checkout on a dedicated branch unless isolated execution is clearly justified.
 
-**Isolated mode CLI:** When worktrees are explicitly chosen, prefer `solo-os bl-review|bl-prepare|bl-status|bl-sync|bl-finish`. Use lower-level git worktree commands only when Solo OS does not support the required operation.
+**Isolated mode:** When worktrees are explicitly chosen, use `git worktree` and normal repo merge flows. The open-source `solo-os` CLI may not include `bl-prepare` / `bl-sync` / `bl-finish` helpers; prefer `solo-os bl-review` + `git worktree` unless the current `solo-os --help` list shows those commands.
 
 ## Build Loop Enforcement
 

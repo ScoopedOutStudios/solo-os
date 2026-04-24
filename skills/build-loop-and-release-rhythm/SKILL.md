@@ -9,7 +9,7 @@ description: Run a repeatable build-to-release loop with clear gates, minimal bl
 
 For Issues/Projects queries and updates, prefer `solo-os gh-list|gh-next|gh-update|gh-promote|gh-close` over ad hoc `gh issue` / `gh project` commands.
 
-When worktrees are explicitly chosen, prefer `solo-os bl-review|bl-prepare|bl-status|bl-sync|bl-finish` over raw git worktree commands.
+For Build Loops, prefer `solo-os bl-review` and `solo-os bl-status` (when you need a cross-repo Build Loop list). If you need isolated worktrees, use `git worktree` directly; do not assume `solo-os` includes worktree management helpers unless they appear in `solo-os --help` for the repository you are using.
 
 Default to simple mode for active Build Loop execution: stay in the current checkout on a dedicated branch unless isolated execution is clearly justified.
 

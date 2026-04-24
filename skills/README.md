@@ -1,5 +1,7 @@
 # Solo OS Skills
 
+> **Context:** How skills differ from [commands](../commands/README.md) and [agents](../agents/README.md) — and a suggested order for new work — is in the [main README](../README.md#use-the-bundled-ai-assets). Run `solo-os onboarding` for the same narrative in the terminal.
+
 Skills are structured workflow specifications that provide AI agents with repeatable, domain-specific guidance for common tasks. Each skill defines a purpose, trigger conditions, workflow steps, required outputs, artifact rules, and guardrails — ensuring consistent, high-quality execution across product development, discovery, growth, and operations.
 
 ## Installation

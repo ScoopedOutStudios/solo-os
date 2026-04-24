@@ -1,6 +1,12 @@
 # Solo OS Commands
 
+> **Context:** Skills live under [skills/](../skills/README.md), agent roles under [agents/](../agents/README.md). For when to use which, start at the [main README](../README.md#use-the-bundled-ai-assets) or `solo-os onboarding`.
+
 These are **Cursor slash-commands** that provide guided workflows for the Solo OS system. Each command gives the AI agent structured instructions for a specific workflow step — triaging ideas, creating build loops, executing work, validating outcomes, and managing your daily focus.
+
+The Python CLI in this repository also provides “paper” guides and creation primitives the slash-commands can reference:
+- `solo-os workflow-start` (quick tour: Idea → Roadmap → Build Loop)
+- `solo-os gh-create` (create a GitHub issue, add to Project, and set `Kind/Status/Stage` in one step)
 
 ## Installation
 

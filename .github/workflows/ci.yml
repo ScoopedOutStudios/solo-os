@@ -52,7 +52,17 @@ jobs:
           python -m solo_os init --help
           python -m solo_os verify --help
           python -m solo_os gh-brief --help
+          python -m solo_os gh-create --help
+          python -m solo_os workflow-start --help
           python -m solo_os daily-triage --help
+
+      - name: Bundled artifacts smoke (no network)
+        run: |
+          test -f solo_os/templates/user-guide-getting-started.md
+          test -f solo_os/templates/workflow-start.md
+          python -m solo_os onboarding >/dev/null
+          python -m solo_os workflow-start >/dev/null
+          python -m solo_os build-loop-template --path-only >/dev/null
 
   compile:
     name: compile

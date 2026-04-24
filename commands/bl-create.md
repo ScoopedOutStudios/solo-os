@@ -12,4 +12,4 @@ Please:
 5. Define the validation plan, release/rollback plan, and learning question.
 6. Recommend the execution mode: `simple mode` by default, or `isolated mode` only if worktrees are clearly justified.
 7. Recommend initial Status and whether any child tasks are actually necessary.
-8. Create or update the GitHub issue using Solo OS commands.
+8. Create or update the GitHub issue using Solo OS (prefer `solo-os gh-create --from-template build-loop` for new issues, or `solo-os gh-update` to edit an existing one). Set `Kind/Status/Stage` on the Project item.

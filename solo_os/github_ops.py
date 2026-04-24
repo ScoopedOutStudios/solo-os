@@ -364,6 +364,35 @@ def issue_view(repo: str, number: int) -> dict[str, Any]:
     )
 
 
+def create_issue(
+    repo: str,
+    *,
+    title: str,
+    body: str,
+    labels: list[str] | None = None,
+) -> dict[str, Any]:
+    """Create a new GitHub issue and return the issue JSON payload (repo-scoped)."""
+    if not str(title).strip():
+        raise RuntimeError("Issue title is required.")
+    args: list[str] = [
+        "issue",
+        "create",
+        "--repo",
+        repo,
+        "--title",
+        str(title),
+        "--body-file",
+        "-",
+        "--json",
+        "number,title,url,state",
+    ]
+    if labels:
+        for label in labels:
+            label_value = str(label).strip()
+            if label_value:
+                args.extend(["--label", label_value])
+    return run_gh_json(args, input_text=body)
+
 def edit_issue(
     repo: str,
     number: int,
