@@ -3,12 +3,21 @@
 from __future__ import annotations
 
 import shutil
+import tempfile
+import urllib.request
+import zipfile
+from os.path import commonpath
 from pathlib import Path
 from typing import Literal
+
+from solo_os import config
 
 IdeName = Literal["cursor", "claude-code", "codex"]
 AgentsIdeName = Literal["cursor", "claude-code"]
 CommandsIdeName = Literal["cursor", "claude-code"]
+
+DEFAULT_ASSET_REF = "main"
+ASSET_ARCHIVE_URL = "https://github.com/ScoopedOutStudios/solo-os/archive/refs/heads/{ref}.zip"
 
 AGENTS_TARGETS: dict[AgentsIdeName, Path] = {
     "cursor": Path.home() / ".cursor" / "agents",
@@ -52,19 +61,65 @@ def _resolve_target(args: object, kind: str) -> tuple[str, Path]:
             "Codex best practices recommend AGENTS.md + skills instead of markdown command packs."
         )
     if target:
-        return ide, Path(target)
+        return ide, Path(target).expanduser().resolve()
     if kind == "agents":
         return ide, AGENTS_TARGETS[ide]  # type: ignore[index]
     if kind == "skills":
         return ide, SKILLS_TARGETS[ide]
     if kind == "commands":
-        return ide, COMMANDS_TARGETS[ide]  # type: ignore[index]
+        return ide, _workspace_command_target(COMMANDS_TARGETS[ide])  # type: ignore[index]
     raise RuntimeError(f"Unsupported install kind: {kind}")
 
 
 def _pkg_root() -> Path:
     """Return the solo-os repo/package root (parent of solo_os/)."""
     return Path(__file__).resolve().parent.parent.parent
+
+
+def _workspace_command_target(relative_target: Path) -> Path:
+    """Resolve workspace-local command target from solo-os config when available."""
+    try:
+        root = config.find_root(start=Path.cwd())
+    except config.ConfigNotFoundError:
+        root = Path.cwd()
+    return (root / relative_target).resolve()
+
+
+def _download_asset_pack(kind: str) -> Path:
+    """Fetch bundled AI assets from the public repo when wheel installs lack source dirs."""
+    ref = DEFAULT_ASSET_REF
+    url = ASSET_ARCHIVE_URL.format(ref=ref)
+    tmp_dir = Path(tempfile.mkdtemp(prefix="solo-os-assets-"))
+    archive_path = tmp_dir / "solo-os.zip"
+    try:
+        urllib.request.urlretrieve(url, archive_path)  # noqa: S310 - fixed public GitHub URL.
+        with zipfile.ZipFile(archive_path) as archive:
+            for member in archive.infolist():
+                target = (tmp_dir / member.filename).resolve()
+                if commonpath([str(tmp_dir.resolve()), str(target)]) != str(tmp_dir.resolve()):
+                    raise RuntimeError(f"Unsafe path in downloaded archive: {member.filename}")
+            archive.extractall(tmp_dir)
+    except Exception as exc:  # pragma: no cover - network failures are environment-specific
+        raise RuntimeError(
+            f"Could not fetch Solo OS {kind} assets from {url}: {exc}\n"
+            "Try again with network access, or pass --target from a full solo-os checkout."
+        ) from exc
+
+    extracted_roots = [p for p in tmp_dir.iterdir() if p.is_dir() and p.name.startswith("solo-os-")]
+    if not extracted_roots:
+        raise RuntimeError(f"Downloaded Solo OS archive did not contain an extracted repo root: {url}")
+    src = extracted_roots[0] / kind
+    if not src.exists():
+        raise RuntimeError(f"Downloaded Solo OS archive did not contain '{kind}' assets: {url}")
+    return src
+
+
+def _asset_source(kind: str) -> tuple[Path, str]:
+    """Resolve asset source from checkout first, then public GitHub fallback for wheels."""
+    checkout_src = _pkg_root() / kind
+    if checkout_src.exists():
+        return checkout_src, "local checkout"
+    return _download_asset_pack(kind), "public GitHub archive"
 
 
 def _copy_files(
@@ -119,13 +174,9 @@ def _copy_files(
 def handle_install_agents(args: object) -> int:
     ide, target = _resolve_target(args, "agents")
     force = getattr(args, "force", False)
-    src = _pkg_root() / "agents"
+    src, source_label = _asset_source("agents")
 
-    if not src.exists():
-        print(f"Error: agents directory not found at {src}")
-        return 1
-
-    print(f"Installing agents for IDE '{ide}' to {target} ...")
+    print(f"Installing agents for IDE '{ide}' from {source_label} to {target} ...")
     installed = _copy_files(src, target, force=force, glob_pattern="*.md")
     print(f"  {len(installed)} file(s) installed.")
     return 0
@@ -134,13 +185,9 @@ def handle_install_agents(args: object) -> int:
 def handle_install_skills(args: object) -> int:
     ide, target = _resolve_target(args, "skills")
     force = getattr(args, "force", False)
-    src = _pkg_root() / "skills"
+    src, source_label = _asset_source("skills")
 
-    if not src.exists():
-        print(f"Error: skills directory not found at {src}")
-        return 1
-
-    print(f"Installing skills for IDE '{ide}' to {target} ...")
+    print(f"Installing skills for IDE '{ide}' from {source_label} to {target} ...")
     installed = _copy_files(
         src, target, force=force, glob_pattern="*.md", recursive=True
     )
@@ -151,13 +198,9 @@ def handle_install_skills(args: object) -> int:
 def handle_install_commands(args: object) -> int:
     ide, target = _resolve_target(args, "commands")
     force = getattr(args, "force", False)
-    src = _pkg_root() / "commands"
+    src, source_label = _asset_source("commands")
 
-    if not src.exists():
-        print(f"Error: commands directory not found at {src}")
-        return 1
-
-    print(f"Installing commands for IDE '{ide}' to {target} ...")
+    print(f"Installing commands for IDE '{ide}' from {source_label} to {target} ...")
     installed = _copy_files(src, target, force=force, glob_pattern="*.md")
     print(f"  {len(installed)} file(s) installed.")
     return 0

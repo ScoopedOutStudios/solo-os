@@ -44,6 +44,12 @@ STATUS_ORDER = {
     "Done": 5,
 }
 
+KIND_ORDER = {
+    "Build Loop": 0,
+    "Roadmap": 1,
+    "Idea": 2,
+}
+
 _TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 
 
@@ -100,6 +106,28 @@ def print_items(items: list[dict[str, str]], output_format: str) -> None:
         print(json.dumps(items, indent=2))
         return
     print(format_rows(items))
+
+
+def print_grouped_items(items: list[Any], output_format: str) -> None:
+    groups: dict[str, list[dict[str, str]]] = {}
+    for item in items:
+        groups.setdefault(item.kind or "-", []).append(row_for_item(item))
+
+    if output_format == "json":
+        print(json.dumps(groups, indent=2))
+        return
+
+    if not groups:
+        print("No matching items.")
+        return
+
+    ordered_kinds = sorted(groups, key=lambda kind: (KIND_ORDER.get(kind, 99), kind))
+    for index, kind in enumerate(ordered_kinds):
+        if index:
+            print()
+        rows = groups[kind]
+        print(f"{kind} ({len(rows)})")
+        print(format_rows(rows))
 
 
 def extract_section(body: str, heading: str) -> str:
@@ -286,27 +314,29 @@ def handle_list(args: argparse.Namespace) -> int:
 def handle_next(args: argparse.Namespace) -> int:
     cfg = get_project_config()
     items = list_project_items(cfg, repo=args.repo, state="open")
-    allowed_kinds = {"Roadmap", "Build Loop"}
-    if args.include_ideas:
-        allowed_kinds.add("Idea")
 
     actionable = [
         item
         for item in items
-        if item.kind in allowed_kinds and item.status in {"In Progress", "Prioritized", "Todo"}
+        if item.kind in {"Idea", "Roadmap", "Build Loop"}
+        and item.status in {"In Progress", "Prioritized", "Todo"}
     ]
     if not actionable:
-        actionable = [item for item in items if item.kind in allowed_kinds and item.status == "Backlog"]
+        actionable = [
+            item
+            for item in items
+            if item.kind in {"Idea", "Roadmap", "Build Loop"} and item.status == "Backlog"
+        ]
 
     actionable.sort(
         key=lambda item: (
+            KIND_ORDER.get(item.kind, 99),
             STATUS_ORDER.get(item.status, 999),
             item.repo,
             item.number,
         )
     )
-    rows = [row_for_item(item) for item in actionable[: args.limit]]
-    print_items(rows, args.format)
+    print_grouped_items(actionable[: args.limit], args.format)
     return 0
 
 

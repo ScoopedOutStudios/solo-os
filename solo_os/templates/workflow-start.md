@@ -20,7 +20,7 @@ You can also skip directly to a Build Loop when execution is the main risk (Solo
 solo-os gh-create --repo <owner/name> --title "[Idea] <short name>" --from-template idea --kind Idea --status Todo --stage Inbox
 ```
 
-### A2) Create a Roadmap bet (optional, but the “ committed strategy” object)
+### A2) Create a Roadmap bet (optional, but the “committed strategy” object)
 
 ```bash
 solo-os gh-create --repo <owner/name> --title "[Roadmap] <short name>" --from-template roadmap --kind Roadmap --status Prioritized --stage "This Week"

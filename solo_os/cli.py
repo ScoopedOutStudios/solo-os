@@ -28,7 +28,11 @@ def _build_parser() -> argparse.ArgumentParser:
     # --- gh-next ---
     gh_next = subparsers.add_parser("gh-next", help="Show the next actionable project-backed items")
     gh_next.add_argument("--repo", help="Repo alias or owner/name")
-    gh_next.add_argument("--include-ideas", action="store_true", help="Include Idea items in shortlist")
+    gh_next.add_argument(
+        "--include-ideas",
+        action="store_true",
+        help="Deprecated no-op: Idea items are included by default",
+    )
     gh_next.add_argument("--limit", type=int, default=10)
     gh_next.add_argument("--format", choices=["table", "json"], default="table")
 

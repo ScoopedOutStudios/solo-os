@@ -16,6 +16,11 @@ Automatic (recommended):
 solo-os install-commands
 ```
 
+By default, Solo OS installs commands into the workspace root discovered from
+`solo-os.yml`, e.g. `<workspace>/.cursor/commands/solo-os`. If no config is
+available, it falls back to the current directory. Use `--target` only when you
+want to override that automatic workspace resolution.
+
 For other IDE profiles:
 
 ```bash

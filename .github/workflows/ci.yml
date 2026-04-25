@@ -31,6 +31,16 @@ jobs:
           python -m pip install dist/*.whl
           solo-os --help
 
+      - name: Smoke install bundled AI packs from wheel
+        run: |
+          tmp="$(mktemp -d)"
+          solo-os install-agents --target "$tmp/agents"
+          solo-os install-skills --target "$tmp/skills"
+          solo-os install-commands --target "$tmp/commands"
+          test -f "$tmp/agents/workflow_orchestrator.md"
+          test -f "$tmp/skills/idea-triage/SKILL.md"
+          test -f "$tmp/commands/idea-triage.md"
+
   cli-smoke:
     name: cli-smoke
     runs-on: ubuntu-latest

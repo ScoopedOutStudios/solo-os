@@ -135,6 +135,8 @@ If `gh-list` or `gh-next` show no rows, you likely need to **add at least one is
 
 Solo OS ships **skills** (repeatable `SKILL.md` workflows), **IDE slash-commands** (for Cursor/Claude Code; see `commands/`), and **agent** role specs (e.g. PM, eng lead) you install with the CLI. They are **optional**: the CLI and GitHub project remain the source of truth for state.
 
+Install behavior works from both a source checkout and a normal `pipx`/wheel install. Agents and skills install to your global IDE profile by default. Commands install to the workspace root discovered from `solo-os.yml` (falling back to the current directory only if no config is found), so you do not need to run the command from one exact folder inside a configured workspace.
+
 1. **Install the packs** (from a repo in your workspace, or pass `--target` to match your tool’s paths):
   ```bash
    solo-os install-skills
@@ -182,7 +184,7 @@ Solo OS currently supports GitHub Projects V2 only. Issues are managed with stru
 | `solo-os verify`                  | Validate environment, config, and project setup                               |
 | `solo-os daily-triage`            | Review stages, flag WIP violations, suggest moves                             |
 | `solo-os gh-list`                 | List project-backed GitHub issues                                             |
-| `solo-os gh-next`                 | Show next actionable items                                                    |
+| `solo-os gh-next`                 | Show next actionable items grouped by Kind                                    |
 | `solo-os gh-brief --question <q>` | Answer planning questions (`active-work`, `roadmap-now`, `in-progress-ideas`) |
 | `solo-os gh-create`               | Create an issue and add it to the Project (optionally set Kind/Status/Stage)  |
 | `solo-os gh-update`               | Update issue content and/or project fields                                    |

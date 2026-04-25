@@ -35,7 +35,7 @@ Solo OS bootstraps:
 pipx install git+https://github.com/ScoopedOutStudios/solo-os.git
 ```
 
-(If you are developing from a local checkout, `pipx install -e .` is fine.)
+(If you are developing from source, follow the development instructions in the public repo: https://github.com/ScoopedOutStudios/solo-os#development.)
 
 ## 4) One-time auth check
 
@@ -137,6 +137,8 @@ solo-os install-commands
 solo-os install-agents
 ```
 
+Agents and skills install to your global IDE profile by default. Commands install to the workspace root discovered from `solo-os.yml` (or the current directory if no config exists), so they remain scoped to the workspace where you use Solo OS.
+
 Then start with a simple story:
 - `idea-triage` → decide Go/Park/Kill and capture assumptions
 - `roadmap-plan` → create a real Roadmap bet
@@ -154,10 +156,12 @@ solo-os workflow-start
 - **`verify` fails on project fields:** rerun `solo-os init` to repair/align project fields, then `solo-os verify` again
 - **CLI output looks empty:** you probably have issues that are not **on the project**, or the project fields are not set
 - **Permission errors on Projects:** re-check `gh auth` scopes, and confirm you can access the Project as an org member/user (admin requirements vary)
-- **You want a strategy doc:** that belongs in `docs/` (or your product docs) — it is *not* a tracked Solo OS “workflow object”
+- **You want a strategy doc:** keep that in your product documentation — it is *not* a tracked Solo OS “workflow object”
 
 ## 11) Where to read next in this repository
 
-- `docs/workflow-spec.md` (canonical semantics: Kind/Status/Stage, lifecycles)
-- `docs/governance/build-loop-and-release-rhythm.md` (what “good” looks like in execution + release)
-- `README.md` (install + command list + system overview)
+Use the hosted GitHub docs so the links work whether you installed with `pipx` or cloned the repo:
+
+- Workflow spec: https://github.com/ScoopedOutStudios/solo-os/blob/main/docs/workflow-spec.md
+- Build loop and release rhythm: https://github.com/ScoopedOutStudios/solo-os/blob/main/docs/governance/build-loop-and-release-rhythm.md
+- README / command list: https://github.com/ScoopedOutStudios/solo-os#readme
