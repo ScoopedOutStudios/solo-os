@@ -2,6 +2,26 @@
 
 These are the CLI commands available in the `solo-os` package. Most users interact with Solo OS through `chief-of-staff` and the installed AI agents — these commands are the **primitives that agents use under the hood** and are also available for direct use when you prefer manual control.
 
+`solo-os --help` intentionally shows the small AI-assisted path: setup, install the AI packs, ask `chief-of-staff`, and use a few high-signal focus/build commands. This reference keeps the complete command surface for agents, automation, and power users.
+
+## Default Help Commands
+
+These commands appear in `solo-os --help` because they are useful to first-time users or common enough to run directly:
+
+| Command | Description |
+|---------|-------------|
+| `solo-os init` | Set up `solo-os.yml` and GitHub Project fields |
+| `solo-os verify` | Validate environment, config, and GitHub Project setup |
+| `solo-os onboarding` | Print the AI-first getting-started guide |
+| `solo-os workflow-start` | Print a guided Idea → Roadmap → Build Loop tour |
+| `solo-os install-agents` | Install Solo OS AI agent specs |
+| `solo-os install-skills` | Install Solo OS AI skills |
+| `solo-os install-commands` | Install Solo OS slash-command shortcuts |
+| `solo-os gh-create` | Create a project-backed Idea, Roadmap item, or Build Loop |
+| `solo-os gh-next` | Show next actionable items grouped by Kind |
+| `solo-os daily-triage` | Review current focus and stage hygiene |
+| `solo-os bl-review` | Review Build Loop Checkpoint A readiness |
+
 ## Setup Commands
 
 | Command | Description |

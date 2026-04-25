@@ -10,12 +10,21 @@ from pathlib import Path
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="solo-os",
-        description="CLI toolkit for solo/small-team project governance on GitHub Projects V2",
+        description="AI-assisted operating layer for GitHub Projects-based solo/small-team execution.",
+        epilog=(
+            "Recommended first run:\n"
+            "  solo-os init\n"
+            "  solo-os verify\n"
+            "  solo-os install-agents && solo-os install-skills && solo-os install-commands\n\n"
+            "Then ask the `chief-of-staff` agent what to do next. Advanced CLI primitives\n"
+            "are still available for agents and power users; see docs/cli-reference.md."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command", required=True, metavar="command")
 
     # --- gh-list ---
-    gh_list = subparsers.add_parser("gh-list", help="List project-backed GitHub issues")
+    gh_list = subparsers.add_parser("gh-list", help=argparse.SUPPRESS)
     gh_list.add_argument("--repo", help="Repo alias or owner/name")
     gh_list.add_argument("--kind", help="Filter by Kind")
     gh_list.add_argument("--status", help="Filter by Status")
@@ -26,7 +35,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_list.add_argument("--format", choices=["table", "json"], default="table")
 
     # --- gh-next ---
-    gh_next = subparsers.add_parser("gh-next", help="Show the next actionable project-backed items")
+    gh_next = subparsers.add_parser("gh-next", help="Show next actionable items grouped by Kind")
     gh_next.add_argument("--repo", help="Repo alias or owner/name")
     gh_next.add_argument(
         "--include-ideas",
@@ -37,7 +46,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_next.add_argument("--format", choices=["table", "json"], default="table")
 
     # --- gh-brief ---
-    gh_brief = subparsers.add_parser("gh-brief", help="Answer common planning questions with pretty output")
+    gh_brief = subparsers.add_parser("gh-brief", help=argparse.SUPPRESS)
     gh_brief.add_argument(
         "--question",
         required=True,
@@ -51,7 +60,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_brief.add_argument("--color", choices=["auto", "always", "never"], default="auto")
 
     # --- gh-create ---
-    gh_create = subparsers.add_parser("gh-create", help="Create a GitHub issue and (by default) add it to the Solo OS project with fields")
+    gh_create = subparsers.add_parser("gh-create", help="Create a project-backed Idea, Roadmap item, or Build Loop")
     gh_create.add_argument("--repo", required=True, help="Repo alias or owner/name")
     gh_create.add_argument("--title", required=True, help="Issue title (use [Idea]/[Roadmap]/[Build Loop] prefixes as you prefer)")
     create_body = gh_create.add_mutually_exclusive_group()
@@ -81,7 +90,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_create.add_argument("--dry-run", action="store_true", help="Preview the mutation without creating the issue")
 
     # --- gh-update ---
-    gh_update = subparsers.add_parser("gh-update", help="Update issue content and/or project fields")
+    gh_update = subparsers.add_parser("gh-update", help=argparse.SUPPRESS)
     gh_update.add_argument("--repo", required=True, help="Repo alias or owner/name")
     gh_update.add_argument("--issue", required=True, type=int, help="Issue number")
     gh_update.add_argument("--title", help="Replace the issue title")
@@ -95,7 +104,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_update.add_argument("--dry-run", action="store_true", help="Preview the mutation without applying it")
 
     # --- gh-promote ---
-    gh_promote = subparsers.add_parser("gh-promote", help="Promote an issue to a different Kind")
+    gh_promote = subparsers.add_parser("gh-promote", help=argparse.SUPPRESS)
     gh_promote.add_argument("--repo", required=True, help="Repo alias or owner/name")
     gh_promote.add_argument("--issue", required=True, type=int, help="Issue number")
     gh_promote.add_argument("--kind", default="Roadmap", help="Target Kind")
@@ -103,7 +112,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_promote.add_argument("--dry-run", action="store_true", help="Preview the mutation without applying it")
 
     # --- gh-close ---
-    gh_close = subparsers.add_parser("gh-close", help="Close an issue and sync project status")
+    gh_close = subparsers.add_parser("gh-close", help=argparse.SUPPRESS)
     gh_close.add_argument("--repo", required=True, help="Repo alias or owner/name")
     gh_close.add_argument("--issue", required=True, type=int, help="Issue number")
     gh_close.add_argument("--reason", choices=["completed", "not_planned"], default="completed")
@@ -112,7 +121,7 @@ def _build_parser() -> argparse.ArgumentParser:
     gh_close.add_argument("--dry-run", action="store_true", help="Preview the mutation without applying it")
 
     # --- gh-migrate-titles ---
-    gh_migrate = subparsers.add_parser("gh-migrate-titles", help="Rename legacy workflow issue prefixes")
+    gh_migrate = subparsers.add_parser("gh-migrate-titles", help=argparse.SUPPRESS)
     gh_migrate.add_argument("--repo", help="Repo alias or owner/name")
     gh_migrate.add_argument("--state", choices=["open", "closed", "all"], default="open")
     gh_migrate.add_argument("--apply", action="store_true", help="Apply the title migration")
@@ -120,31 +129,31 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # --- daily-triage ---
     daily_triage = subparsers.add_parser(
-        "daily-triage", help="Daily triage: review stages, flag WIP violations, suggest moves"
+        "daily-triage", help="Review current focus and stage hygiene"
     )
     daily_triage.add_argument("--apply", action="store_true", help="Persist recommended stage changes")
     daily_triage.add_argument("--color", choices=["auto", "always", "never"], default="auto")
     daily_triage.add_argument("--format", choices=["pretty", "json"], default="pretty")
 
     # --- sync-audit ---
-    subparsers.add_parser("sync-audit", help="Run local sync audit checks")
+    subparsers.add_parser("sync-audit", help=argparse.SUPPRESS)
 
     # --- verify ---
-    verify = subparsers.add_parser("verify", help="Validate environment, config, and project setup")
+    verify = subparsers.add_parser("verify", help="Validate environment, config, and GitHub Project setup")
     verify.add_argument("--path", default=".", help="Directory to start config discovery from")
     verify.add_argument("--format", choices=["table", "json"], default="table")
 
     # --- onboarding ---
     subparsers.add_parser(
         "onboarding",
-        help="Print the getting-started guide (empty project, workflow, and AI packs). Same text as the bundled user guide.",
+        help="Print the AI-first getting-started guide",
     )
 
     # --- workflow-start ---
-    subparsers.add_parser("workflow-start", help="Print a guided tour for Idea -> Roadmap -> Build Loop (CLI + optional AI packs)")
+    subparsers.add_parser("workflow-start", help="Print a guided Idea -> Roadmap -> Build Loop tour")
 
     # --- init ---
-    init_cmd = subparsers.add_parser("init", help="Guided setup for solo-os.yml and GitHub Project fields")
+    init_cmd = subparsers.add_parser("init", help="Set up solo-os.yml and GitHub Project fields")
     init_cmd.add_argument("--yes", action="store_true", help="Non-interactive mode using defaults")
     init_cmd.add_argument("--owner", help="GitHub owner (org or user)")
     init_cmd.add_argument("--owner-type", choices=["org", "user"], help="Owner type override")
@@ -157,53 +166,61 @@ def _build_parser() -> argparse.ArgumentParser:
     init_cmd.add_argument("--format", choices=["table", "json"], default="table")
 
     # --- cleanup-markdown ---
-    cleanup = subparsers.add_parser("cleanup-markdown", help="Archive redundant markdown artifacts")
+    cleanup = subparsers.add_parser("cleanup-markdown", help=argparse.SUPPRESS)
     cleanup.add_argument("--apply", action="store_true", help="Move cleanup candidates to archive")
     cleanup.add_argument("--repo", help="Optional repo id to scope cleanup")
 
     # --- bl-review ---
-    bl_review = subparsers.add_parser("bl-review", help="Review a Build Loop issue for Checkpoint A readiness")
+    bl_review = subparsers.add_parser("bl-review", help="Review Build Loop Checkpoint A readiness")
     bl_review.add_argument("--repo", required=True, help="Repo alias or owner/name")
     bl_review.add_argument("--issue", required=True, type=int, help="Build Loop issue number")
     bl_review.add_argument("--format", choices=["table", "json"], default="table")
     bl_review.add_argument("--color", choices=["auto", "always", "never"], default="auto")
 
     # --- bl-status ---
-    bl_status = subparsers.add_parser("bl-status", help="Show open Build Loop issues across repos")
+    bl_status = subparsers.add_parser("bl-status", help=argparse.SUPPRESS)
     bl_status.add_argument("--repo", help="Optional repo alias or owner/name")
     bl_status.add_argument("--limit", type=int, default=20, help="Maximum items to show")
     bl_status.add_argument("--format", choices=["table", "json"], default="table")
     bl_status.add_argument("--color", choices=["auto", "always", "never"], default="auto")
 
     # --- weekly-cycle ---
-    subparsers.add_parser("weekly-cycle", help="Run weekly maintenance: sync-audit then cleanup-markdown")
+    subparsers.add_parser("weekly-cycle", help=argparse.SUPPRESS)
 
     # --- install-agents ---
-    inst_agents = subparsers.add_parser("install-agents", help="Install agent specs for supported IDEs")
+    inst_agents = subparsers.add_parser("install-agents", help="Install Solo OS AI agent specs")
     inst_agents.add_argument("--ide", choices=["cursor", "claude-code"], default="cursor",
                              help="IDE target profile (default: cursor)")
     inst_agents.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_agents.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- install-skills ---
-    inst_skills = subparsers.add_parser("install-skills", help="Install skill specs for supported IDEs")
+    inst_skills = subparsers.add_parser("install-skills", help="Install Solo OS AI skills")
     inst_skills.add_argument("--ide", choices=["cursor", "claude-code", "codex"], default="cursor",
                              help="IDE target profile (default: cursor)")
     inst_skills.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_skills.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- install-commands ---
-    inst_cmds = subparsers.add_parser("install-commands", help="Install command specs for supported IDEs")
+    inst_cmds = subparsers.add_parser("install-commands", help="Install Solo OS slash-command shortcuts")
     inst_cmds.add_argument("--ide", choices=["cursor", "claude-code"], default="cursor",
                            help="IDE target profile (default: cursor)")
     inst_cmds.add_argument("--target", help="Target directory (overrides IDE default path)")
     inst_cmds.add_argument("--force", action="store_true", help="Overwrite existing files")
 
     # --- build-loop-template ---
-    blt = subparsers.add_parser("build-loop-template", help="Print the canonical Build Loop issue body template")
+    blt = subparsers.add_parser("build-loop-template", help=argparse.SUPPRESS)
     blt.add_argument("--kind", choices=["idea", "roadmap", "build-loop"], default="build-loop",
                      help="Which template to print")
     blt.add_argument("--path-only", action="store_true", help="Print only the template path")
+
+    # Keep advanced/agent-only primitives callable by name, but remove them from
+    # the default help list so first-time users see the AI-assisted happy path.
+    subparsers._choices_actions = [  # type: ignore[attr-defined]  # noqa: SLF001
+        action
+        for action in subparsers._choices_actions  # type: ignore[attr-defined]  # noqa: SLF001
+        if action.help != argparse.SUPPRESS
+    ]
 
     return parser
 
