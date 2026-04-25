@@ -68,7 +68,7 @@ Generate alternative problem framings that unlock new solution spaces, user segm
 - Cross-reference the originating idea/triage artifact that triggered the reframing.
 
 ## Sub-agent Handoffs
-- `big_thinker`: primary agent that drives this skill — provides creative reframing lens.
+- `big-thinker`: primary agent that drives this skill — provides creative reframing lens.
 - `idea-triage`: if reframing produces a substantially new idea, run it through triage.
 - `customer-discovery-interview`: when the recommended reframing needs customer validation.
 - `product-manager`: when reframing implies a strategic pivot or roadmap change.

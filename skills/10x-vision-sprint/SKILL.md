@@ -73,10 +73,10 @@ Imagine the most ambitious possible solution to a validated problem, distill the
 - If the repo still uses compatibility pointers, update `agent_generated/plans/LATEST.md` when a vision doc becomes the active north star, while keeping it pointer-only.
 
 ## Sub-agent Handoffs
-- `big_thinker`: primary agent that drives this skill — provides visionary lens and creative ambition.
+- `big-thinker`: primary agent that drives this skill — provides visionary lens and creative ambition.
 - `mvp-scope-and-roadmap`: for formal scoping of the smallest-magic MVP.
 - `product-manager`: for roadmap alignment and staged delivery planning.
-- `eng_lead`: for feasibility assessment of technically ambitious vision elements.
+- `software-engineer`: for feasibility assessment of technically ambitious vision elements.
 - `solution-probe-poc`: when the core magic needs a quick prototype to validate desirability.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 
@@ -91,5 +91,5 @@ Imagine the most ambitious possible solution to a validated problem, distill the
 - The 10x vision must be grounded in user need, not technology fascination. "Cool tech" without user pull is not a valid 10x.
 - The smallest-magic version must be meaningfully different from a standard MVP — it should preserve the wow, not just be "small."
 - Every stage in the path from MVP to 10x must have a clear validation gate — no assumed progression.
-- Do not scope or estimate the stages in detail; hand off to `mvp-scope-and-roadmap` and `eng_lead`.
+- Do not scope or estimate the stages in detail; hand off to `mvp-scope-and-roadmap` and `software-engineer`.
 - If the validated evidence is weak, recommend more discovery before running a vision sprint.

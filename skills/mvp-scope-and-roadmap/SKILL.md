@@ -49,8 +49,8 @@ Convert validated customer evidence into a smallest-valuable product scope and d
 
 ## Sub-agent Handoffs
 - `product-manager`: confirm roadmap alignment and prioritization quality.
-- `eng_lead`: validate feasibility, sequencing, and technical risk.
-- `security_eng`: review trust/privacy implications of scoped features.
+- `software-engineer`: validate feasibility, sequencing, and technical risk.
+- `security-engineer`: review trust/privacy implications of scoped features.
 - `qa-release-manager`: verify release-readiness expectations for phased delivery.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 

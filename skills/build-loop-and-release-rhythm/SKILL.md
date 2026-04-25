@@ -25,7 +25,7 @@ Invoke this skill when:
 - Declaring a build loop complete (run Checkpoint C).
 - Preparing a release for external users (run Checkpoint B, if non-trivial).
 
-The **chief_of_staff** agent is the default driver. Project rules should reference this skill in a "Build Loop Discipline" section so agents know to invoke it at loop boundaries.
+The **chief-of-staff** agent is the default driver. Project rules should reference this skill in a "Build Loop Discipline" section so agents know to invoke it at loop boundaries.
 
 ## Use When
 - You are ready to implement scoped work.
@@ -102,7 +102,7 @@ Use the lowest honest tier. Escalate if the blast radius, trust sensitivity, or 
 - Checkpoint A: intake approved (scope + metric clear)
 - Checkpoint B: release decision (risk managed)
 - Checkpoint C: post-release learning decision
-  - For external-facing loops: include a **release quality retrospective** — what broke during the release window, what was missed by QA, and what to feed into the next loop's QA checklist. Have `qa` review if available.
+  - For external-facing loops: include a **release quality retrospective** — what broke during the release window, what was missed by QA, and what to feed into the next loop's QA checklist. Have `quality-engineer` review if available.
 
 Use only these three by default. Add more only for high-risk work.
 
@@ -146,18 +146,18 @@ Use only these three by default. Add more only for high-risk work.
 - Track active workflow state in GitHub Projects/Issues, not in markdown artifacts.
 
 ## Sub-agent Handoffs
-- `chief_of_staff`: orchestrate cross-functional sequence and conflict resolution.
-- `eng_lead`: implementation feasibility, architecture, and slicing.
-- `qa`: release readiness and rollback safety.
-- `security_eng`: trust/privacy checks for sensitive surfaces.
-- `pm`: scope discipline and outcome alignment.
+- `chief-of-staff`: orchestrate cross-functional sequence and conflict resolution.
+- `software-engineer`: implementation feasibility, architecture, and slicing.
+- `quality-engineer`: release readiness and rollback safety.
+- `security-engineer`: trust/privacy checks for sensitive surfaces.
+- `product-manager`: scope discipline and outcome alignment.
 - cos runs the artifact governance checklist (metadata, placement, version) before final approval.
 
 ### Routing by risk
 
-- `Low` internal-only loops: `pm` / `eng_lead` is usually enough.
-- `Medium` external-facing loops: add `qa`.
-- `High` / `Critical` loops: add `qa`; add `security_eng` for auth, payments, privacy, production data integrity, or trust-sensitive changes.
+- `Low` internal-only loops: `product-manager` / `software-engineer` is usually enough.
+- `Medium` external-facing loops: add `quality-engineer`.
+- `High` / `Critical` loops: add `quality-engineer`; add `security-engineer` for auth, payments, privacy, production data integrity, or trust-sensitive changes.
 
 ## Depth and Token Guidance
 - Default output target: 1200-2100 words for build-loop planning and checkpoint decisions.
@@ -177,11 +177,11 @@ For pre-revenue projects with <100 users, use a lighter checkpoint profile:
 
 - **Checkpoint A:** Required. 3 lines: goal, scope, metric. ~2 minutes.
 - **Checkpoint B:** Lightweight only for `Low` internal loops where branch validation history is already clean and rollback is simple.
-  - **Exception — external-facing loops:** If the loop ships to non-founder users (ICP outreach, public demos, beta invites), invoke `qa` for a scoped release readiness check: core flow validation, smoke test pass, share/embed/landing checks, known-issues list.
+  - **Exception — external-facing loops:** If the loop ships to non-founder users (ICP outreach, public demos, beta invites), invoke `quality-engineer` for a scoped release readiness check: core flow validation, smoke test pass, share/embed/landing checks, known-issues list.
 - **Checkpoint C:** Required. Learning note + next-plan update decision.
   - Include a "release quality retrospective" line: what broke, what was missed, feed into next loop.
-- Skip sub-agent handoffs to `security_eng` unless the loop touches auth, PII, or payment.
-- Skip sub-agent handoffs to `qa` only for honest `Low` internal-only loops. Invoke for any **external-facing** release (see Checkpoint B exception above).
+- Skip sub-agent handoffs to `security-engineer` unless the loop touches auth, PII, or payment.
+- Skip sub-agent handoffs to `quality-engineer` only for honest `Low` internal-only loops. Invoke for any **external-facing** release (see Checkpoint B exception above).
 
 Graduate to the full checkpoint profile when the product has paying users or public exposure (e.g., Product Hunt launch).
 
@@ -196,7 +196,7 @@ Maintain a queue of 2-3 execution-ready plans ahead of the active loop:
 
 ### Review Pre-Step Template
 
-Include this section at the top of every queued plan (after metadata, before the task list). The chief_of_staff runs it when transitioning to the next loop:
+Include this section at the top of every queued plan (after metadata, before the task list). The chief-of-staff runs it when transitioning to the next loop:
 
 ```markdown
 ## Review Pre-Step (run before Checkpoint A)

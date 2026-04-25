@@ -83,7 +83,7 @@ Adapt source selection based on the specific market and geography.
 - Every data point must have source attribution with publication date.
 
 ## Sub-agent Handoffs
-- `research_guru`: primary agent that drives this skill.
+- `research-analyst`: primary agent that drives this skill.
 - `product-manager`: receives market context for roadmap and scoping decisions.
 - `pricing-and-unit-economics` (skill): receives pricing benchmarks and willingness-to-pay data.
 - `customer-segment-and-access-map` (skill): receives audience demographics and behavior data.

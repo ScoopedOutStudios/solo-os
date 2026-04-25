@@ -37,7 +37,8 @@ jobs:
           solo-os install-agents --target "$tmp/agents"
           solo-os install-skills --target "$tmp/skills"
           solo-os install-commands --target "$tmp/commands"
-          test -f "$tmp/agents/workflow_orchestrator.md"
+          test -f "$tmp/agents/chief-of-staff.md"
+          test -f "$tmp/agents/software-engineer.md"
           test -f "$tmp/skills/idea-triage/SKILL.md"
           test -f "$tmp/commands/idea-triage.md"
 

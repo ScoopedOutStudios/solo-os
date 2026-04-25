@@ -48,8 +48,8 @@ Run disciplined experiments that improve growth outcomes and reduce go-to-market
 
 ## Sub-agent Handoffs
 - `product-manager`: validate strategic alignment and resource tradeoffs.
-- `eng_lead`: assess implementation/instrumentation feasibility.
-- `security_eng`: validate privacy-safe instrumentation and data handling.
+- `software-engineer`: assess implementation/instrumentation feasibility.
+- `security-engineer`: validate privacy-safe instrumentation and data handling.
 - `qa-release-manager`: validate safe rollout/rollback for experiment changes.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
 

@@ -54,7 +54,7 @@ Turn a triaged idea into an actionable customer access plan so discovery can run
 - `product-manager`: validate segment choice against roadmap and value proposition.
 - Use `go-to-market-experiments` (skill) when channel strategy and conversion optimization require experiment planning.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
-- `chief_of_staff`: resolve cross-functional conflicts or blocked recruitment decisions.
+- `chief-of-staff`: resolve cross-functional conflicts or blocked recruitment decisions.
 
 ## Depth and Token Guidance
 - Default output target: 1050-1950 words for segmentation and channel planning.

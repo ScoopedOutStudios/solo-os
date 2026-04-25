@@ -14,7 +14,7 @@ Research and structure a comprehensive competitive landscape analysis for a spec
 - During discovery to understand how competitors solve the same problem.
 - When PM needs competitive positioning context for roadmap decisions.
 - When designing positioning or differentiation experiments.
-- When big_thinker or opportunity-scanner needs landscape awareness.
+- When big-thinker or opportunity-scanner needs landscape awareness.
 
 ## Execution Context (Resource Reality)
 - The founder operates with advanced generative AI: autonomous agents, sub-agents, skills, and frontier models.
@@ -74,8 +74,8 @@ Adapt source selection based on the specific domain. These are starting points, 
 - Every factual claim must have source attribution.
 
 ## Sub-agent Handoffs
-- `research_guru`: primary agent that drives this skill.
-- `big_thinker` / `opportunity-scanner`: receives competitive gaps as opportunity input.
+- `research-analyst`: primary agent that drives this skill.
+- `big-thinker` / `opportunity-scanner`: receives competitive gaps as opportunity input.
 - `product-manager`: receives positioning context for roadmap decisions.
 - Optionally use `go-to-market-experiments` (skill) when the brief feeds positioning experiments.
 - `pricing-and-unit-economics` (skill): receives pricing comparisons as input.
@@ -90,6 +90,6 @@ Adapt source selection based on the specific domain. These are starting points, 
 ## Guardrails
 - Every factual claim must be labeled `[Verified]`, `[Directional]`, or `[Inference]` with source.
 - Do not fabricate company data, funding amounts, or review quotes.
-- Do not make strategic recommendations — present findings and hand off to PM or `big_thinker`.
+- Do not make strategic recommendations — present findings and hand off to PM or `big-thinker`.
 - If the competitive domain is too broad, ask the user to narrow before researching.
 - Flag when competitive data is thin or unreliable for a specific player.

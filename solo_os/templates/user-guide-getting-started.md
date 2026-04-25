@@ -10,13 +10,13 @@ solo-os onboarding
 
 ## 1) The mental model (what you are doing)
 
-- **Source of truth:** GitHub Projects + Issues, not a pile of private markdown “status boards”.
+- **Source of truth:** GitHub Projects + Issues, not a pile of private markdown "status boards".
 - **Structure via fields (defaults):** `Kind`, `Status`, `Stage`.
 - **Kinds:** `Idea`, `Roadmap`, `Build Loop`.
 - **Stages (time focus):** `Inbox`, `Today`, `This Week`, `Waiting` (WIP and stage rules are designed to keep focus sane).
-- **Optional accelerators:** install Solo OS **skills / commands / agents** to standardize how an AI helps you *write and operate* the workflow (GitHub is still the source of truth).
+- **AI-first workflow:** install Solo OS **agents / skills / commands** and let `chief-of-staff` orchestrate your workflow (GitHub is still the source of truth).
 
-If this sounds heavy: **Tier 1** value is just “I know what to do today” once items exist. Everything else is adoption layers.
+If this sounds heavy: **Tier 1** value is just "I know what to do today" once items exist. Everything else is adoption layers.
 
 ## 2) Prereqs (one-time)
 
@@ -60,17 +60,17 @@ What `init` is doing, in human terms:
 - **Pick/creates a GitHub Project (v2)**
 - **Ensure required project fields** exist (`Kind`, `Status`, `Stage`) with the expected options
 - **Write `solo-os.yml`**, which tells Solo OS which repos belong to the workspace
-- **Print “recommended views”** you can create in GitHub’s UI (Solo OS does not auto-create these views)
+- **Print "recommended views"** you can create in GitHub's UI (Solo OS does not auto-create these views)
 
 ### Empty project is normal
-If the GitHub Project has no issues **added to the project** yet, most CLI “planning” commands will look empty. That is expected. Add issues to the project, then set the fields.
+If the GitHub Project has no issues **added to the project** yet, most CLI "planning" commands will look empty. That is expected. Add issues to the project, then set the fields.
 
 ## 6) Your first 15 minutes: create 1–3 real items in GitHub
 
 Solo OS works best if you have at least:
 - 1 `Idea` in `Inbox` or `Todo` (or `In Progress` if you are actively exploring)
-- 1 `Roadmap` bet in `Prioritized` / `In Progress` (optional, but it’s the “committed strategy” object)
-- 1 `Build Loop` in `Today` or `This Week` (optional, but it’s the “bounded execution” object)
+- 1 `Roadmap` bet in `Prioritized` / `In Progress` (optional, but it's the "committed strategy" object)
+- 1 `Build Loop` in `Today` or `This Week` (optional, but it's the "bounded execution" object)
 
 ### 6.1) Create a structured issue (CLI-first path)
 
@@ -100,7 +100,7 @@ solo-os gh-promote --repo <owner/name> --issue <N> --kind Roadmap --status Prior
 
 (You can also create a new Roadmap issue and link the Idea in the body under **Parent Linkage** — pick whichever traceability you want.)
 
-## 7) The daily loop (this is the “punch line” for Tier 1)
+## 7) The daily loop (this is the "punch line" for Tier 1)
 
 Run:
 
@@ -112,7 +112,7 @@ solo-os gh-brief --question active-work
 
 What you should get:
 - A stage-oriented review (`daily-triage`)
-- A “what should I do next?” shortlist (`gh-next`)
+- A "what should I do next?" shortlist (`gh-next`)
 - A narrative brief (`gh-brief`) for common questions
 
 ## 8) Build loop discipline (Checkpoint A first)
@@ -127,36 +127,41 @@ solo-os bl-review --repo <owner/name> --issue <N>
 
 Solo OS focuses on **Checkpoint A readiness** in the core CLI. Checkpoints B/C are primarily **governance and execution practice**; treat them as contract + habits, not magic automation, unless you add tooling around them.
 
-## 9) Optional: install AI “operating system packs”
+## 9) Install the AI packs (recommended)
 
 If you use Cursor, Claude Code, or similar:
 
 ```bash
+solo-os install-agents
 solo-os install-skills
 solo-os install-commands
-solo-os install-agents
 ```
 
 Agents and skills install to your global IDE profile by default. Commands install to the workspace root discovered from `solo-os.yml` (or the current directory if no config exists), so they remain scoped to the workspace where you use Solo OS.
 
-Then start with a simple story:
+**Start with `chief-of-staff`** — it is the single AI entrypoint. Ask it what to do next and it will:
+- Create Ideas, Roadmap bets, and Build Loops directly using CLI primitives
+- Route to specialist agents (`software-engineer`, `product-manager`, `quality-engineer`, etc.) when deeper work is needed
+- Interpret `daily-triage` and `gh-next` results for you
+
+Or use slash-commands as power-user shortcuts:
 - `idea-triage` → decide Go/Park/Kill and capture assumptions
 - `roadmap-plan` → create a real Roadmap bet
 - `bl-create` → create a Build Loop with explicit scope + non-goals
 - `bl-execute` → drive execution and stop before merge for human approval
 
-If you want a guided “do the next right thing” tour:
+If you want a guided CLI-first tour:
 
 ```bash
 solo-os workflow-start
 ```
 
-## 10) If something feels “broken”
+## 10) If something feels "broken"
 
 - **`verify` fails on project fields:** rerun `solo-os init` to repair/align project fields, then `solo-os verify` again
 - **CLI output looks empty:** you probably have issues that are not **on the project**, or the project fields are not set
 - **Permission errors on Projects:** re-check `gh auth` scopes, and confirm you can access the Project as an org member/user (admin requirements vary)
-- **You want a strategy doc:** keep that in your product documentation — it is *not* a tracked Solo OS “workflow object”
+- **You want a strategy doc:** keep that in your product documentation — it is *not* a tracked Solo OS "workflow object"
 
 ## 11) Where to read next in this repository
 

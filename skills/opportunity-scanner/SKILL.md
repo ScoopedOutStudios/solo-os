@@ -73,7 +73,7 @@ Systematically scan a domain for user behavior trends, technology shifts, compet
 - If the repo still uses compatibility pointers, update `agent_generated/ideas/LATEST.md` when a new opportunity brief becomes the active reference, while keeping it pointer-only.
 
 ## Sub-agent Handoffs
-- `big_thinker`: primary agent that drives this skill — provides domain context and creative lens.
+- `big-thinker`: primary agent that drives this skill — provides domain context and creative lens.
 - `idea-triage`: formal Go/Park/Kill scoring for top-ranked opportunities.
 - `product-manager`: roadmap fit and strategic alignment check.
 - Apply artifact governance rules (metadata, placement, version) before finalizing artifacts.
@@ -87,6 +87,6 @@ Systematically scan a domain for user behavior trends, technology shifts, compet
 ## Guardrails
 - Keep scanning focused; do not attempt to cover an entire industry in one pass. Narrow the domain.
 - Every opportunity must have a riskiest assumption and validation path — no pure speculation.
-- Do not evaluate technical feasibility in depth; flag and hand off to `eng_lead`.
+- Do not evaluate technical feasibility in depth; flag and hand off to `software-engineer`.
 - Do not confuse "interesting trend" with "actionable opportunity" — require a clear value hypothesis for each.
 - If the domain is too broad, ask the user to narrow before scanning.
