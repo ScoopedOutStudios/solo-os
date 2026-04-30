@@ -29,6 +29,7 @@ jobs:
       - name: Install built wheel
         run: |
           python -m pip install dist/*.whl
+          solo-os --version
           solo-os --help
 
       - name: Smoke install bundled AI packs from wheel
@@ -57,9 +58,18 @@ jobs:
       - name: Install package
         run: python -m pip install --upgrade pip && python -m pip install .
 
+      - name: Version smoke
+        run: |
+          python -m solo_os --version
+          solo-os --version
+          solo-os --version | grep -qE '^solo-os [0-9]+\.[0-9]+\.[0-9]+'
+
       - name: Run CLI help checks
         run: |
           python -m solo_os --help
+          solo-os --help | grep -q "chief-of-staff"
+          # Advanced agent-only commands should not appear in default help
+          ! solo-os --help | grep -q "gh-update"
           python -m solo_os init --help
           python -m solo_os verify --help
           python -m solo_os gh-brief --help

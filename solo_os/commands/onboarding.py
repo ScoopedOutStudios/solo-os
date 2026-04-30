@@ -693,6 +693,19 @@ def handle_doctor(args: argparse.Namespace) -> int:
     check_path = Path(getattr(args, "path", ".")).expanduser().resolve()
     results: list[CheckResult] = []
 
+    from solo_os import __version__
+
+    exe_path = shutil.which("solo-os") or "not found on PATH"
+    editable = " (editable/source install)" if "site-packages" not in (sys.prefix or "") else ""
+    version_detail = f"solo-os {__version__} — executable: {exe_path}{editable}"
+    results.append(
+        CheckResult(
+            name="solo-os-version",
+            status="PASS",
+            detail=version_detail,
+        )
+    )
+
     has_gh = shutil.which("gh") is not None
     results.append(
         CheckResult(

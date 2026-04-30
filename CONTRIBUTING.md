@@ -11,7 +11,7 @@ Thanks for your interest in improving Solo OS.
 ## Local Development
 
 ```bash
-git clone https://github.com/ScoopedOutStudios/solo-os.git
+git clone https://github.com/rohitnandwate/solo-os.git
 cd solo-os
 pipx install -e .
 python3 -m solo_os --help

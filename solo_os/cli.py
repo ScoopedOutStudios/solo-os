@@ -6,6 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from solo_os import __version__
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -20,6 +22,9 @@ def _build_parser() -> argparse.ArgumentParser:
             "are still available for agents and power users; see docs/cli-reference.md."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "-V", "--version", action="version", version=f"%(prog)s {__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True, metavar="command")
 

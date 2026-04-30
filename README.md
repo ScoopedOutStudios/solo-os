@@ -1,7 +1,7 @@
 # Solo OS
 
-[CI](https://github.com/ScoopedOutStudios/solo-os/actions/workflows/ci.yml)
-[License: MIT](https://github.com/ScoopedOutStudios/solo-os/blob/main/LICENSE)
+[CI](https://github.com/rohitnandwate/solo-os/actions/workflows/ci.yml)
+[License: MIT](https://github.com/rohitnandwate/solo-os/blob/main/LICENSE)
 [Python 3.10+](https://www.python.org/downloads/)
 
 Solo OS is a GitHub Projects V2 operating layer for solo builders and small teams who want clear execution loops instead of planning chaos.
@@ -57,7 +57,21 @@ gh auth status
 ### 2) Install Solo OS
 
 ```bash
-pipx install git+https://github.com/ScoopedOutStudios/solo-os.git
+pipx install git+https://github.com/rohitnandwate/solo-os.git
+solo-os --version          # confirm the installed version
+```
+
+**Update an existing install:**
+
+```bash
+pipx upgrade solo-os
+solo-os --version
+```
+
+If upgrade does not pick up changes (stale shim), force reinstall:
+
+```bash
+pipx install --force git+https://github.com/rohitnandwate/solo-os.git
 ```
 
 ### 3) Initialize from workspace root
@@ -209,7 +223,7 @@ Contributions are welcome.
 ## Development
 
 ```bash
-git clone https://github.com/ScoopedOutStudios/solo-os.git
+git clone https://github.com/rohitnandwate/solo-os.git
 cd solo-os
 pipx install -e .
 python3 -m solo_os --help

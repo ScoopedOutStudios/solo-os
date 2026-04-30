@@ -32,10 +32,24 @@ Solo OS bootstraps:
 ## 3) Install Solo OS (recommended)
 
 ```bash
-pipx install git+https://github.com/ScoopedOutStudios/solo-os.git
+pipx install git+https://github.com/rohitnandwate/solo-os.git
+solo-os --version          # confirm the installed version
 ```
 
-(If you are developing from source, follow the development instructions in the public repo: https://github.com/ScoopedOutStudios/solo-os#development.)
+**Update an existing install:**
+
+```bash
+pipx upgrade solo-os
+solo-os --version
+```
+
+If upgrade does not pick up changes (stale shim), force reinstall:
+
+```bash
+pipx install --force git+https://github.com/rohitnandwate/solo-os.git
+```
+
+(If you are developing from source, follow the development instructions in the public repo: https://github.com/rohitnandwate/solo-os#development.)
 
 ## 4) One-time auth check
 
@@ -167,6 +181,6 @@ solo-os workflow-start
 
 Use the hosted GitHub docs so the links work whether you installed with `pipx` or cloned the repo:
 
-- Workflow spec: https://github.com/ScoopedOutStudios/solo-os/blob/main/docs/workflow-spec.md
-- Build loop and release rhythm: https://github.com/ScoopedOutStudios/solo-os/blob/main/docs/governance/build-loop-and-release-rhythm.md
-- README / command list: https://github.com/ScoopedOutStudios/solo-os#readme
+- Workflow spec: https://github.com/rohitnandwate/solo-os/blob/main/docs/workflow-spec.md
+- Build loop and release rhythm: https://github.com/rohitnandwate/solo-os/blob/main/docs/governance/build-loop-and-release-rhythm.md
+- README / command list: https://github.com/rohitnandwate/solo-os#readme

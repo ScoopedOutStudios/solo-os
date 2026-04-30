@@ -17,7 +17,7 @@ AgentsIdeName = Literal["cursor", "claude-code"]
 CommandsIdeName = Literal["cursor", "claude-code"]
 
 DEFAULT_ASSET_REF = "main"
-ASSET_ARCHIVE_URL = "https://github.com/ScoopedOutStudios/solo-os/archive/refs/heads/{ref}.zip"
+ASSET_ARCHIVE_URL = "https://github.com/rohitnandwate/solo-os/archive/refs/heads/{ref}.zip"
 
 AGENTS_TARGETS: dict[AgentsIdeName, Path] = {
     "cursor": Path.home() / ".cursor" / "agents",

@@ -4,12 +4,29 @@ These are the CLI commands available in the `solo-os` package. Most users intera
 
 `solo-os --help` intentionally shows the small AI-assisted path: setup, install the AI packs, ask `chief-of-staff`, and use a few high-signal focus/build commands. This reference keeps the complete command surface for agents, automation, and power users.
 
+## Version and Diagnostics
+
+```bash
+solo-os --version       # print installed version
+solo-os verify          # first check reports version + executable path
+```
+
+If `solo-os --help` shows outdated commands or a stale layout, the installed CLI needs upgrading:
+
+```bash
+pipx upgrade solo-os                # normal upgrade
+# or force reinstall if the shim is stale:
+pipx install --force git+https://github.com/rohitnandwate/solo-os.git
+solo-os --version                   # confirm update
+```
+
 ## Default Help Commands
 
 These commands appear in `solo-os --help` because they are useful to first-time users or common enough to run directly:
 
 | Command | Description |
 |---------|-------------|
+| `solo-os --version` | Print the installed Solo OS version |
 | `solo-os init` | Set up `solo-os.yml` and GitHub Project fields |
 | `solo-os verify` | Validate environment, config, and GitHub Project setup |
 | `solo-os onboarding` | Print the AI-first getting-started guide |
